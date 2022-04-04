@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.2] - 2022-04-04
+Some early graphical changes, stats, and early races
+
+### Added
+- Color Gradients to tiles
+  - Gradiants are harsher for non-wall tiles.
+- Added class component for entities, giving units useless stats (for now!)
+  - Added getter methods for stats
+    - Will help when 5 spells, 3 traits, 5 pieces of gear and 2 debuffs affect strength
+  - Added Race Dependant Stats
+- Map Forgetting is currently dependant on <code>4^player.intelligence</code>. 
+  - Might be worthwhile to add a specific stat for map rememberence, and checking if there are any items or other things that influence it.
+    - Feels messed up that a dwarf wouldn't be able to remember the way
+
+
 
 ## [0.0.1] - 2022-04-02
  

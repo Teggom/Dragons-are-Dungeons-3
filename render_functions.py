@@ -1,7 +1,7 @@
 import libtcodpy as libtcod
 
 
-def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors):
+def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_width, screen_height):
     if fov_recompute:
     # Draw all the tiles in the game map
         for y in range(game_map.height):
@@ -13,22 +13,22 @@ def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, sc
 
                 if visible:
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, colors.get('light_wall'), libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(con, x, y, game_map.tiles[x][y].get_color("Visible"), libtcod.BKGND_SET)
                     else:
-                        libtcod.console_set_char_background(con, x, y, colors.get('light_ground'), libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(con, x, y, game_map.tiles[x][y].get_color("Visible"), libtcod.BKGND_SET)
                     game_map.tiles[x][y].explored = True
                     game_map.tiles[x][y].last_seen = 0
 
                 elif game_map.tiles[x][y].explored:
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(con, x, y, game_map.tiles[x][y].get_color("Explored"), libtcod.BKGND_SET)
                     else:
-                        libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
+                        libtcod.console_set_char_background(con, x, y, game_map.tiles[x][y].get_color("Explored"), libtcod.BKGND_SET)
 
                 
                 if game_map.tiles[x][y].explored and not visible:
-                    if game_map.tiles[x][y].step():
-                        libtcod.console_set_char_background(con, x, y, libtcod.Color(0,0,0), libtcod.BKGND_SET)
+                    if game_map.tiles[x][y].step(player):
+                        libtcod.console_set_char_background(con, x, y, game_map.tiles[x][y].get_color("Unseen"), libtcod.BKGND_SET)
 
     # Draw all entities in the list
     for entity in entities:
