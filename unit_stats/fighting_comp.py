@@ -1,5 +1,5 @@
 class stats():
-    def __init__(self, owner, unit_type="Human"):
+    def __init__(self, unit_type="Human"):
         stat_package = self.get_stat_package(unit_type)
         self.base_hp = stat_package['base_hp']
         self.curr_hp = stat_package['base_hp']
@@ -12,8 +12,10 @@ class stats():
         self.base_wisdom = stat_package['base_wisdom']
         self.base_endurance = stat_package['base_endurance']
         self.base_luck = stat_package['base_luck']
-        self.owner = owner
+        self.base_memory = stat_package['base_memory']
+        self.base_fov = stat_package['base_fov']
     
+
     @property
     def max_hp(self):
         return(self.base_hp)
@@ -50,18 +52,31 @@ class stats():
     def luck(self):
         return(self.base_luck)
     
+    
+    @property
+    def memory(self):
+        return(self.base_memory)
+
+    @property 
+    def fov(self):
+        return(self.base_fov)
+
     def get_stat_package(self, unit_type):
         if unit_type == "Human":
-            tup = (20, 10, 8, 6, 6, 5, 5, 7, 3)
+            tup = (20, 10, 8, 6, 6, 5, 5, 7, 3, 8, 6)
         elif unit_type == "Elf":
-            tup = (15, 20, 5, 8, 8, 9, 8, 3, 2)
+            tup = (15, 20, 5, 8, 8, 9, 8, 3, 2, 4, 12)
         elif unit_type == "Dwarf":
-            tup = (30, 5, 11, 8, 6, 4, 6, 10, 2)
+            tup = (30, 5, 11, 8, 6, 4, 6, 10, 2, 12, 15)
         elif unit_type == "Goblin":
-            tup = (12, 2, 6, 4, 2, 1, 2, 4, 1)
+            tup = (12, 2, 6, 4, 2, 1, 2, 4, 1, 4, 4)
+        elif unit_type == "Orc":
+            tup = (20, 0, 8, 4, 2, 1, 2, 4, 1, 4, 4)
+        elif unit_type == "Troll":
+            tup = (40, 0, 12, 4, 2, 1, 2, 4, 1, 4, 4)
         else:
             # No type found
-            tup = (1, 1, 1, 1, 1, 1, 1, 1, 1)
+            tup = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
         package = tup
         return({
             "base_hp" : package[0],
@@ -72,5 +87,7 @@ class stats():
             "base_charisma" : package[5],
             "base_wisdom" : package[6],
             "base_endurance" : package[7],
-            "base_luck" : package[8]
+            "base_luck" : package[8],
+            "base_memory" : package[9],
+            "base_fov" : package[10]
         })

@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.0.3] - 2022-04-05
+General Advancement
+
+### Added
+- Some functions for testing out animations
+- Simple Enemies
+  - Goblin, Orc, Troll
+- AI for NPCs
+  - Wander
+  - Basic Merchant
+  - basic Monster
+    - With A*
+- Elves now scream and run into walls
+
+### Changed
+- Player is now a Goblin by Default
+- FOV and Memory are now their own stats
+  - FOV is euclidean distance
+  - Memory maintains the same modifier for now. 
+    - <code>player.stats.memory**4</code> 
+  - Both of these stats are now defined by race
+
+
+
+
 ## [0.0.2] - 2022-04-04
 Some early graphical changes, stats, and early races
 

@@ -1,8 +1,9 @@
 from random import randint
-
+import tcod as libtcod
+from entity import Entity
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
-
+from unit_stats.ai import BasicMonster
 
 class GameMap:
     def __init__(self, width, height):
@@ -11,11 +12,11 @@ class GameMap:
         self.tiles = self.initialize_tiles()
 
     def initialize_tiles(self):
-        tiles = [[Tile(True, "Wall") for y in range(self.height)] for x in range(self.width)]
+        tiles = [[Tile(True, "Wall", x, y) for y in range(self.height)] for x in range(self.width)]
 
         return tiles
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player):
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, min_monsters_per_room, max_monsters_per_room):
         rooms = []
         num_rooms = 0
 
@@ -65,6 +66,7 @@ class GameMap:
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
                         # finally, append the new room to the list
+                self.place_entities(new_room, entities, min_monsters_per_room, max_monsters_per_room)
                 rooms.append(new_room)
                 num_rooms += 1
 
@@ -72,15 +74,34 @@ class GameMap:
         # go through the tiles in the rectangle and make them passable
         for x in range(room.x1 + 1, room.x2):
             for y in range(room.y1 + 1, room.y2):
-                self.tiles[x][y].update_tile(False, "Floor", False)
+                self.tiles[x][y].update_tile(False, "Floor", x, y, block_sight = False)
 
     def create_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.tiles[x][y].update_tile(False, "Floor", False)
+            self.tiles[x][y].update_tile(False, "Floor", x, y, block_sight = False)
 
     def create_v_tunnel(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.tiles[x][y].update_tile(False, "Floor", False)
+            self.tiles[x][y].update_tile(False, "Floor", x, y, block_sight = False)
+
+    def place_entities(self, room, entities, min_monsters_per_room, max_monsters_per_room):
+        # Get a random number of monsters
+        number_of_monsters = randint(min_monsters_per_room, max_monsters_per_room)
+
+        for i in range(number_of_monsters):
+            # Choose a random location in the room
+            x = randint(room.x1 + 1, room.x2 - 1)
+            y = randint(room.y1 + 1, room.y2 - 1)
+            roll = randint(0, 100)
+            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+                if roll < 80:
+                    monster = Entity(x, y, 'g', libtcod.desaturated_green, "Goblin", "Goblin", blocks=True, ai=BasicMonster())
+                elif roll < 95:
+                    monster = Entity(x, y, 'o', libtcod.blue, "Orc", "Orc", blocks=True, ai=BasicMonster())
+                else:
+                    monster = Entity(x, y, 'T', libtcod.darker_green, "Troll Chief", "Troll", blocks=True, ai=BasicMonster())
+
+                entities.append(monster)
 
     def is_blocked(self, x, y):
         if self.tiles[x][y].blocked:
