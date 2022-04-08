@@ -8,7 +8,9 @@ from render_functions import clear_all, render_all, render_animations
 from game_states import GameStates
 from animations import animation
 from unit_stats.ai import BasicMerchant, Wander
-from unit_stats.traits import trait
+from unit_stats.stat_mod import trait
+
+VERSION = "0.0.5"
 
 def main():
     screen_width = 80
@@ -39,7 +41,7 @@ def main():
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
+    libtcod.console_init_root(screen_width, screen_height, 'Dragons are Dungeons {}'.format(VERSION), False)
 
     con = libtcod.console_new(screen_width, screen_height)
 
@@ -86,6 +88,7 @@ def main():
                     player.move(dx, dy)
                     fov_recompute = True
             player.step()
+            print(player.stats.memory)
             turn += 1
             if turn == 10:
                 print('condition applied')

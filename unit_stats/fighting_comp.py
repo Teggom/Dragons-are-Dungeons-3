@@ -13,156 +13,152 @@ class stats():
         self.base_charisma = stat_package['base_charisma']
         self.base_wisdom = stat_package['base_wisdom']
         self.base_endurance = stat_package['base_endurance']
+
         self.base_luck = stat_package['base_luck']
         self.base_memory = stat_package['base_memory']
         self.base_fov = stat_package['base_fov']
         self.base_perception = stat_package['base_perception']
     
 
+    # Skills
+    # The following do not take luck or base dice rolls into account
+    # Strength
+    @property
+    def athletics(self):
+        Bonus = self.get_skill_mod(self.strength)
+        Bonus += self.skill_check_condition("athletics")
+        Bonus += self.skill_check_traits("athletics")
+        Bonus += self.skill_check_equipment("athletics")
+        return(max(0, Bonus))
+    # Dex
+    # Int
+    # Wis
+    # Cha
+
+
+
+
+
+    # Core Stat Properties
+
     @property
     def max_hp(self):
         total = self.base_hp
-        for trait in self.owner.traits:
-            if trait.modifiers.get('max_hp'):
-                total += trait.modifiers.get('max_hp')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('max_hp'):
-                total += condition.modifiers.get('max_hp')
+        total += self.check_condition("max_hp")
+        total += self.check_traits("max_hp")
+        total += self.check_equipment("max_hp")
         return(max(0, total))
+
     
     @property
     def hp(self):
         total = self.curr_hp
-        for trait in self.owner.traits:
-            if trait.modifiers.get('curr_hp'):
-                total += trait.modifiers.get('curr_hp')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('curr_hp'):
-                total += condition.modifiers.get('curr_hp')
+        total += self.check_condition("hp")
+        total += self.check_traits("hp")
+        total += self.check_equipment("hp")
         return(max(0, total))
+
     
     @property
     def max_mp(self):
         total = self.base_mp
-        for trait in self.owner.traits:
-            if trait.modifiers.get('max_mp'):
-                total += trait.modifiers.get('max_mp')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('max_mp'):
-                total += condition.modifiers.get('max_mp')
+        total += self.check_condition("max_mp")
+        total += self.check_traits("max_mp")
+        total += self.check_equipment("max_mp")
         return(max(0, total))
+
     
     @property
     def mp(self):
         total = self.curr_mp
-        for trait in self.owner.traits:
-            if trait.modifiers.get('curr_mp'):
-                total += trait.modifiers.get('curr_mp')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('curr_mp'):
-                total += condition.modifiers.get('curr_mp')
+        total += self.check_condition("mp")
+        total += self.check_traits("mp")
+        total += self.check_equipment("mp")
         return(max(0, total))
+
 
     @property
     def strength(self):
         total = self.base_strength
-        for trait in self.owner.traits:
-            if trait.modifiers.get('strength'):
-                total += trait.modifiers.get('strength')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('strength'):
-                total += condition.modifiers.get('strength')
+        total += self.check_condition("strength")
+        total += self.check_traits("strength")
+        total += self.check_equipment("strength")
         return(max(0, total))
+
     
     @property
     def dexterity(self):
         total = self.base_dexterity
-        for trait in self.owner.traits:
-            if trait.modifiers.get('dexterity'):
-                total += trait.modifiers.get('dexterity')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('dexterity'):
-                total += condition.modifiers.get('dexterity')
+        total += self.check_condition("dexterity")
+        total += self.check_traits("dexterity")
+        total += self.check_equipment("dexterity")
         return(max(0, total))
+
     
     @property
     def intelligence(self):
         total = self.base_intelligence
-        for trait in self.owner.traits:
-            if trait.modifiers.get('intelligence'):
-                total += trait.modifiers.get('intelligence')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('intelligence'):
-                total += condition.modifiers.get('intelligence')
+        total += self.check_condition("intelligence")
+        total += self.check_traits("intelligence")
+        total += self.check_equipment("intelligence")
         return(max(0, total))
+
     
     @property
     def charisma(self):
         total = self.base_charisma
-        for trait in self.owner.traits:
-            if trait.modifiers.get('charisma'):
-                total += trait.modifiers.get('charisma')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('charisma'):
-                total += condition.modifiers.get('charisma')
+        total += self.check_condition("charisma")
+        total += self.check_traits("charisma")
+        total += self.check_equipment("charisma")
         return(max(0, total))
+
     
     @property
     def wisdom(self):
         total = self.base_wisdom
-        for trait in self.owner.traits:
-            if trait.modifiers.get('wisdom'):
-                total += trait.modifiers.get('wisdom')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('wisdom'):
-                total += condition.modifiers.get('wisdom')
+        total += self.check_condition("wisdom")
+        total += self.check_traits("wisdom")
+        total += self.check_equipment("wisdom")
         return(max(0, total))
+
     
     @property
     def endurance(self):
         total = self.base_endurance
-        for trait in self.owner.traits:
-            if trait.modifiers.get('endurance'):
-                total += trait.modifiers.get('endurance')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('endurance'):
-                total += condition.modifiers.get('endurance')
+        total += self.check_condition("endurance")
+        total += self.check_traits("endurance")
+        total += self.check_equipment("endurance")
         return(max(0, total))
+
     
     @property
     def luck(self):
         total = self.base_luck
-        for trait in self.owner.traits:
-            if trait.modifiers.get('luck'):
-                total += trait.modifiers.get('luck')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('luck'):
-                total += condition.modifiers.get('luck')
+        total += self.check_condition("luck")
+        total += self.check_traits("luck")
+        total += self.check_equipment("luck")
         return(max(0, total))
+
     
     
     @property
     def memory(self):
+        run = ""
         total = self.base_memory
-        for trait in self.owner.traits:
-            if trait.modifiers.get('memory'):
-                total += trait.modifiers.get('memory')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('memory'):
-                total += condition.modifiers.get('memory')
+        total += self.check_condition("memory")
+        total += self.check_traits("memory")
+        total += self.check_equipment("memory")
         return(max(0, total))
 
     @property 
     def fov(self):
         total = self.base_fov
-        for trait in self.owner.traits:
-            if trait.modifiers.get('fov'):
-                total += trait.modifiers.get('fov')
-        for condition in self.owner.conditions:
-            if condition.modifiers.get('fov'):
-                total += condition.modifiers.get('fov')
+        total += self.check_condition("fov")
+        total += self.check_traits("fov")
+        total += self.check_equipment("fov")
         return(max(1, total))
     
+    # TO MOVE
     @property
     def perception(self):
         total = self.base_perception
@@ -281,4 +277,110 @@ class stats():
                 "base_fov" : 1,
                 "base_perception" : 1
             })
-            
+
+
+    # STAT checks
+    # Functions for core stats, checks what they are
+    # Can exceed 100? Doesn't help
+    def check_traits(self, stat):
+        total = 0
+        for trait in self.owner.traits:
+            if trait.modifiers.get(stat):
+                total += trait.modifiers.get(stat)
+        return(total)
+
+    def check_condition(self, stat):
+        total = 0
+        for condition in self.owner.conditions:
+            if condition.modifiers.get(stat):
+                total += condition.modifiers.get(stat)
+        return(total)
+
+    def check_equipment(self, stat):
+        return(0)
+
+
+
+
+    # SKILL checks
+    # Functions for skills, returns the base modifier without luck or d20
+    def skill_check_traits(self, skill):
+        total = 0
+        for trait in self.owner.traits:
+            if trait.modifiers.get(skill):
+                total += self.skill_level_to_bonus(trait.modifiers.get(skill))
+        return(total)
+
+    def skill_check_condition(self, skill):
+        total = 0
+        for condition in self.owner.conditions:
+            if condition.modifiers.get(skill):
+                total += self.skill_level_to_bonus(condition.modifiers.get(skill))
+        return(total)
+
+    def skill_check_equipment(self, skill):
+        return(0)
+    
+
+
+
+
+    # Used for converting skill levels and stat values to bonuses for the roll
+    #  a ring of acrobatics would have its level used here
+    #  ring of acrobatics 3 would have 3 passed in here for a value to use on the dc
+    def skill_level_to_bonus(self, skill_level):
+        if skill_level <= 0:
+            return(0)
+        if skill_level == 1:
+            return(2)
+        if skill_level == 2:
+            return(5)
+        if skill_level == 3:
+            return(9)
+        if skill_level == 4:
+            return(14)
+        if skill_level >= 5:
+            return(20)
+
+
+    # Skill mod. here, 50 strength gives 8 to roll 
+    def get_skill_mod(self, stat_value):
+        if stat_value <= 1:
+            return(-5)
+        if stat_value <= 2:
+            return(-4)
+        if stat_value <= 3:
+            return(-3)
+        if stat_value <= 5:
+            return(-2)
+        if stat_value <= 7:
+            return(-1)
+        if stat_value <= 10:
+            return(0)
+        if stat_value <= 13:
+            return(1)
+        if stat_value <= 17:
+            return(2)
+        if stat_value <= 21:
+            return(3)
+        if stat_value <= 26:
+            return(4)
+        if stat_value <= 31:
+            return(5)
+        if stat_value <= 37:
+            return(6)
+        if stat_value <= 43:
+            return(7)
+        if stat_value <= 56:
+            return(8)
+        if stat_value <= 64:
+            return(9)
+        if stat_value <= 73:
+            return(10)
+        if stat_value <= 82:
+            return(11)
+        if stat_value <= 91:
+            return(12)
+        if stat_value <= 100:
+            return(13)
+                    
