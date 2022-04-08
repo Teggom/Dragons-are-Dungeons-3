@@ -8,6 +8,7 @@ from render_functions import clear_all, render_all, render_animations
 from game_states import GameStates
 from animations import animation
 from unit_stats.ai import BasicMerchant, Wander
+from unit_stats.traits import trait
 
 def main():
     screen_width = 80
@@ -26,10 +27,14 @@ def main():
     fov_light_walls = True
 
     game_state = GameStates.PLAYER_TURN
+    blindness = trait("Blindness", fov=-40)
+    supervision = trait("Supervision", fov=40)
+    photomem = trait("Photographic Memory", memory=30)
+    dory = trait("Dory", memory=-30)
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white, "Player", "Goblin")
+    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white, "Player", "Dwarf")
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', libtcod.red, "Human Merchant", "Human", blocks = True, ai=BasicMerchant())
-    npc2 = Entity(int(screen_width / 2 + 5), int(screen_height / 2 + 5), '@', libtcod.green, "Lost Elf", "Elf", blocks = True, ai=Wander())
+    npc2 = Entity(int(screen_width / 2 + 5), int(screen_height / 2 + 5), '@', libtcod.green, "Lost Elf", "Elf", blocks = True, ai=Wander(), traits=[blindness, dory])
     entities = [player, npc, npc2]
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
@@ -47,7 +52,7 @@ def main():
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
-
+    turn = 0
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
@@ -80,12 +85,19 @@ def main():
                 else:
                     player.move(dx, dy)
                     fov_recompute = True
+            player.step()
+            turn += 1
+            if turn == 10:
+                print('condition applied')
+                player.give_condition(trait("Temp Blindness", 10, True, fov=-20))
             game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity.ai:
-                    entity.ai.take_turn(player, fov_map, game_map, entities)
+                if not entity.dead:
+                    if entity.ai:
+                        entity.ai.take_turn(player, fov_map, game_map, entities)
+                        entity.step()
             game_state = GameStates.PLAYER_TURN
 
 

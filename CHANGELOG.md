@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.4] - 2022-04-07
+ 
+### Added
+- Death system
+- Perception Stat
+  - Will be used for look-around and identify
+  - Certain things will be unseen with low enough perception
+    - Given Door
+      - Perception of 10 reveals it is made of stone and locked
+      - Perception of 5 reveals it is made of stone
+      - Perception of 1 might miss that there is a door
+        - ? identifier on map maybe?
+    - Applies to things like Disguises
+- Traits
+  - Traits are currently perm modifiers on your character
+  - You can have any number of traits
+  - Traits add or remove from other stats
+  - Current traits
+    - Blindness, Supervision (Affect FOV)
+    - Dory, Photomem (Affect memory)
+- Conditions
+  - Derived from traits
+  - Expire after a certain amount of time
+  - Player currently receives a temp blindness debuff after 10 steps
+    - Only lasts 10 steps
+
+### Changed
+- Made Elves Blind
+- Made Elves have the memory of a certain blue fish
+
+### Fixed
+- Elves now have a small chance to outright die every turn
+  - about 1 in 4
+
+
 
 ## [0.0.3] - 2022-04-05
 General Advancement

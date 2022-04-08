@@ -6,7 +6,7 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, race, blocks=False, ai=None):
+    def __init__(self, x, y, char, color, name, race, blocks=False, ai=None, traits=[]):
         self.x = x
         self.y = y
         self.char = char
@@ -17,9 +17,28 @@ class Entity:
         self.stats = stats(race)
         self.ai = ai
         self.stats.owner = self 
+        self.dead = False
+        self.traits = traits
+        self.conditions = []
 
         if self.ai:
             self.ai.owner = self
+
+    def give_condition(self, condition):
+        self.conditions.append(condition)
+
+    def kill(self):
+        self.dead = True
+        self.color = libtcod.Color(100, 0, 0)
+
+    def step(self):
+        # happens each turn, idle things like countdowns or cooldowns
+        for condition in self.conditions:
+            if condition.duration < 1:
+                print("Condition {} affecting {} has gone away.".format(condition.name, self.name))
+                self.conditions.remove(condition)
+            else:
+                condition.duration -= 1
 
     def move(self, dx, dy):
         # Move the entity by a given amount
