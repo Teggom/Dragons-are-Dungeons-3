@@ -1,12 +1,13 @@
-from unit_stats.fighting_comp import stats
-from unit_stats.ai import Wander, BasicMerchant, BasicMonster
+from unit_components.fighting_comp import stats
+from unit_components.ai import Wander, BasicMerchant, BasicMonster
 import math
 import tcod as libtcod
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, race, blocks=False, ai=None, traits=[]):
+    def __init__(self, x, y, char, color, name, race=None, blocks=False, ai=None, traits=[],
+                    item=None, inventory=None):
         self.x = x
         self.y = y
         self.char = char
@@ -20,9 +21,17 @@ class Entity:
         self.dead = False
         self.traits = traits
         self.conditions = []
+        self.item = item
+        self.inventory = inventory
 
         if self.ai:
             self.ai.owner = self
+        
+        if self.item:
+            self.item.owner = self
+        
+        if self.inventory:
+            self.inventory.owner = self
 
     def give_condition(self, condition):
         self.conditions.append(condition)

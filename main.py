@@ -7,9 +7,12 @@ from map_objects.game_map import GameMap
 from render_functions import clear_all, render_all, render_animations
 from game_states import GameStates
 from animations import animation
-from unit_stats.ai import BasicMerchant, Wander
-from unit_stats.stat_mod import trait
-
+from unit_components.ai import BasicMerchant, Wander
+from unit_components.damage import Damage
+from unit_components.inventory import Inventory
+from unit_components.item import Item
+from unit_components.stat_mod import trait
+from pprint import pprint
 VERSION = "0.0.5"
 
 def main():
@@ -29,19 +32,19 @@ def main():
     fov_light_walls = True
 
     game_state = GameStates.PLAYER_TURN
-    blindness = trait("Blindness", fov=-40)
-    supervision = trait("Supervision", fov=40)
+    blindness = trait("Blindness", sight=-40)
+    supervision = trait("Supervision", sight=40)
     photomem = trait("Photographic Memory", memory=30)
     dory = trait("Dory", memory=-30)
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white, "Player", "Dwarf")
+    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white, "Player", "Dwarf", inventory=Inventory(gold=20))
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', libtcod.red, "Human Merchant", "Human", blocks = True, ai=BasicMerchant())
-    npc2 = Entity(int(screen_width / 2 + 5), int(screen_height / 2 + 5), '@', libtcod.green, "Lost Elf", "Elf", blocks = True, ai=Wander(), traits=[blindness, dory])
+    npc2 = Entity(int(screen_width / 2 + 5), int(screen_height / 2 + 5), '@', libtcod.green, "Lost Elf", "Elf", blocks = True, ai=Wander(), traits=[blindness, dory], inventory=Inventory(gold=-1))
     entities = [player, npc, npc2]
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-    libtcod.console_init_root(screen_width, screen_height, 'Dragons are Dungeons {}'.format(VERSION), False)
+    libtcod.console_init_root(screen_width, screen_height, 'Dragons are Dungeons 3: {}'.format(VERSION), False)
 
     con = libtcod.console_new(screen_width, screen_height)
 
@@ -59,7 +62,7 @@ def main():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, player.stats.fov, fov_light_walls, fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, player.stats.sight, fov_light_walls, fov_algorithm)
 
         render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_width, screen_height)
 
@@ -88,11 +91,45 @@ def main():
                     player.move(dx, dy)
                     fov_recompute = True
             player.step()
-            print(player.stats.memory)
+            
             turn += 1
+            if turn == 1:
+                print('-'*10, "Sword get")
+                player.inventory.get_item(Item("Sword", "Weapon", damages=[Damage("1d6+3")]))
+                print("Bag:")
+                s=[print(x, player.inventory.bag[x]) for x in player.inventory.bag.keys()]
+                print("Gear:")
+                s=[print(x, player.inventory.wearing[x]) for x in player.inventory.wearing.keys()]
+                print(Item("Sword", "Weapon", damages=[Damage("1d6+3")]))
+            if turn == 2:
+                print('-'*10, "Sword Equip")
+                player.inventory.equip_item(player.inventory.bag['Weapon'][0], "Right Hand")
+                print("Bag:")
+                s=[print(x, player.inventory.bag[x]) for x in player.inventory.bag.keys()]
+                print("Gear:")
+                s=[print(x, player.inventory.wearing[x]) for x in player.inventory.wearing.keys()]
+                print("Player would have done {} Damage.".format(player.inventory.wearing['Right Hand'].get_damage()))
+            if turn == 3:
+                print('-'*10, "helm get and equip")
+                player.inventory.get_item(Item("Helm", "Head"))
+                player.inventory.equip_item(player.inventory.bag['Head'][0])
+                print("Bag:")
+                s=[print(x, player.inventory.bag[x]) for x in player.inventory.bag.keys()]
+                print("Gear:")
+                s=[print(x, player.inventory.wearing[x]) for x in player.inventory.wearing.keys()]
+            if turn == 4:
+                print('-'*10, "Axe replacement twohand")
+                player.inventory.get_item(Item("Axe", "Weapon", damages=[Damage("2d4+2")], twohand=True))
+                player.inventory.equip_item(player.inventory.bag['Weapon'][0])
+                print("Bag:")
+                s=[print(x, player.inventory.bag[x]) for x in player.inventory.bag.keys()]
+                print("Gear:")
+                s=[print(x, player.inventory.wearing[x]) for x in player.inventory.wearing.keys()]
+                print("Player would have done {} Damage.".format(player.inventory.wearing['Right Hand'].get_damage()))
+                
             if turn == 10:
                 print('condition applied')
-                player.give_condition(trait("Temp Blindness", 10, True, fov=-20))
+                player.give_condition(trait("Temp Blindness", 10, True, sight=-20))
             game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:

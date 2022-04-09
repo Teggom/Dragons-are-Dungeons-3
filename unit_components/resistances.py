@@ -1,0 +1,3 @@
+class resistances():
+    pass
+    # TODO

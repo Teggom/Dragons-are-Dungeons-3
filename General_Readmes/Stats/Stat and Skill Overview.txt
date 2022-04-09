@@ -1,0 +1,54 @@
+Stats are core things affecting characters.
+Characters have 2 passive stats, 5 core stats, and 4 secondary stats (Currently)
+
+Passive Stats  
+    HP - Your health
+    MP - Skill and Spellcasting bar
+
+Core Stats - relate the skill checks
+    Strength 
+    Dexterity
+    Intelligence
+    Charisma
+    Wisdom
+
+Secondary Stats - do not have skills built off them
+    luck - A passive value that adds to rolls
+    Memory - How well you can remember the layout of the dungeon
+    Sight - How far you can see in the dungeon
+    Perception - How well can you identify things in the dungeon
+
+Characters also have skills, there are many skills. Skills gain exp
+    Athletics
+    Slight of Hand
+
+
+
+Levels/Computations are as follows
+    Core Stats
+        Gain exp when a reliant skill succeeds
+        Level up increases skill by 1
+        Max skill level is 100
+            Skill cap unbounded
+            101+ gives same bonus
+    Secondary Stats
+        Cannot level up
+        Can be modified with traits/conditions/equipment
+        Luck
+            converts into a dice bonus the same way a regular stat does
+            Bonus is not flat, bonus is a 1d<bonus>
+        Memory 
+            dungeon layout is forgotten at a rate of <since last seen> / (memory ^ 4)
+            Calculation may change
+        Sight   
+            Affects how many tiles can be seen around the character
+                Applies to enemies as well
+        Perception
+            Higher tiers of perception allow you to gleam more information when looking at an object
+                a locked metal door might just be reported as a door with low perception
+    Skills
+        Skills are used to perform any action
+        Successfully performing the action will grant you experience towards that skill and the stats that make up that skill
+        Skill Dice Roll calculations are as follows
+        1d20 + 1d<luck Mod> + <equipment Bonus> + <trait Bonus> + <condition bonus> + <skill Bonus> + <skill level bonus>
+            For an example, see Stat and Dice ROll Breakdown

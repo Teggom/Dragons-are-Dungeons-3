@@ -1,0 +1,31 @@
+# Damage is of the form
+# {"dice_rolls" : <int>, "upper" : <int>, "flat" : <int>}
+# an axe doing 2d6+3 would be
+#   {"dice_rolls" : 2, "upper" : 6, "flat" : 3}
+#   sum(random.sample(range(upper), dice_rolls))+dice_rolls+flat
+class Item:
+    def __init__(self, name, type, traits = {}, stats = {}, damages = [], twohand = False, quantity = 1):
+        self.name = name
+        self.type = type
+        self.traits = traits
+        self.stats = stats
+        self.damages = damages
+        self.twohand = twohand
+        self.quantity = quantity
+        
+    def copy_self(self, quantity = 1):
+        n_item = Item(self.name, self.type, self.traits, self.stats, self.damages, self.twohand, quantity=quantity)
+        n_item.owner = self.owner
+        return(n_item)
+    
+    def get_damage(self):
+        damage = 0
+        for dmg_obj in self.damages:
+            damage += dmg_obj.get_damage()
+        return(max(0, damage))
+    
+    def __str__(self):
+        if self.quantity > 1:
+            return(str(self.name) + " x" + str(self.quantity))
+        else:
+            return(str(self.name))

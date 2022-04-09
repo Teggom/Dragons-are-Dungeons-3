@@ -3,7 +3,7 @@ import tcod as libtcod
 from entity import Entity
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
-from unit_stats.ai import BasicMonster
+from unit_components.ai import BasicMonster
 
 class GameMap:
     def __init__(self, width, height):

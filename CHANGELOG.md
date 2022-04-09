@@ -5,6 +5,37 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+
+## [0.0.6] - 2022-04-09
+
+### Added
+- Inventory and Items! (Bug Free!)
+  - Functionallity
+    - Equiping
+    - Unequiping
+    - Stacking
+    - Twohanding
+    - Gold!
+  - Items can have conditions (poison/chill/burn arrows or weapons)
+  - Items can have traits (perm things affecting skills or stats)
+  - Wearing Slots:
+    - Head, Neck, Chest, Back, L. Arm, R. Arm, L. Hand, R. Hand, Belt, Legs, L.Foot, R. Foot
+  - Bag Slots:
+    - Head, Neck, Chest, Back, Arm, Weapon, Belt, Legs, Feet, Item
+- Damage Objects
+  - parses damage strings
+    - "3d5+10"
+  - For weapons
+- Extra text file in <code>/General_Readmes/Stats/Stat and Skill Overview.txt</code>
+  - Moved prior text file there
+  
+### Changed
+- Elves now start with debt
+
+
+
+
+
 ## [0.0.5] - 2022-04-08
 
 ### Added

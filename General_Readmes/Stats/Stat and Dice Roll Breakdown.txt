@@ -1,0 +1,67 @@
+The following 5 Stats are CORE Stats
+
+Strength
+Dexterity
+Intelligence
+Wisdom
+Charisma
+
+The following skills are combo stats
+Combo stats are used for skill checks
+This means that the main skill is calculated from the others
+*** MORE WILL COME ***
+
+    Skill                    sub stat 1                sub stat 2                  sub stat 3 
+Athletics                   Strength
+Stealth                     Dexterity
+Arcana                      Intelligence
+Perception                  Wisdom
+Deception                   Charisma
+
+
+
+Given a player with 30 strength, 21 luck, level 2 athletics, and gloves of +5 strength, and a level 1 ring of athletics
+Assume you wish to move a rock
+    rock needs a roll of 20 to move
+That rock has built in stats related to various checks
+    Selecting the rock, and trying to use Athletics
+        Athletics is 100% Strength
+            Thus your premod stat is 30 (all strength) 
+                30 will convert to about +6            
+            Your gloves of strength increase your strength by 5
+                this gives you a premod stat of 35
+                    converts to +7
+        Your level 2 in athletics gives you +5
+            level 1 ring of athletics is calculated separately
+                gives you +2 athletics
+        Your 21 luck converts to +3 LUCK mod
+        Thus, your roll against moving the rock is 
+            1d20 <default>
+            + 7 <stat mod>
+            + 5 <skill level>
+            + 2 <equipment>
+            + 1d3 <LUCK mod>
+        For a total of 
+            1d20 + 1d3 + 14
+                min of 16
+                max of 37
+the rock has moved
+    The odds of the rock moving were 17/21
+    Thus exp received is as follows
+        1-17/21 = 4/21 ~= 0.19
+        Rock had skill check of 20
+            Assuming I keep an expo of 1.5
+        floor(20 ^ 1.5) = 89
+        thus there is 89 exp to be given
+        Half of this exp goes to athletics
+        Half of this exp goes to the stats that make up athletics
+        Thus, strength gets ceiling(89/2) exp
+            45 exp
+        Thus, Athletics gets ceiling(89/2) exp
+            45 exp
+        
+        
+    
+
+
+
