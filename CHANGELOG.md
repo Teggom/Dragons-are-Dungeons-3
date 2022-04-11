@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [0.0.7] - 2022-04-11
+
+### Added
+- Main Menu
+- Character Select
+  - Lets you start as different races!
+    - Classes not implemented
+
+### Changed
+- Esc key doesn't exit game unless you're at the main menu
+
+
+
 ## [0.0.6] - 2022-04-09
 
 ### Added

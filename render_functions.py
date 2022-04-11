@@ -1,7 +1,7 @@
 import libtcodpy as libtcod
 
 
-def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_width, screen_height):
+def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, camera_width, camera_height):
     if fov_recompute:
     # Draw all the tiles in the game map
         for y in range(game_map.height):
@@ -34,7 +34,8 @@ def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_w
     for entity in entities:
         draw_entity(con, entity, fov_map)
 
-    libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+    libtcod.console_blit(con, 0, 0, camera_width, camera_height, 0, 1,  0)
+    #libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
 
 def clear_all(con, entities):

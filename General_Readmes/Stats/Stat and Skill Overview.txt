@@ -21,7 +21,7 @@ Secondary Stats - do not have skills built off them
 Characters also have skills, there are many skills. Skills gain exp
     Athletics
     Slight of Hand
-
+    ...
 
 
 Levels/Computations are as follows
