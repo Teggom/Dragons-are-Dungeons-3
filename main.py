@@ -15,7 +15,7 @@ from unit_components.item import Item
 from unit_components.stat_mod import trait
 from pprint import pprint
 from bundled.loaders import load_charselect, load_gamestart, load_preamble, load_mainmenu
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 game = {}
 
 def main():
@@ -97,13 +97,13 @@ def main():
             if game['fov_recompute']:
                 recompute_fov(game['fov_map'], game['player'].x, game['player'].y, game['player'].stats.sight, game['fov_light_walls'], game['fov_algorithm'])
             render_all(game['con'], game['player'], game['entities'], game['game_map'], game['fov_map'], game['fov_recompute'],
-                 game['screen_width'], game['screen_height'], game['camera_width'], game['camera_height'])
+                 game['screen_width'], game['screen_height'], game['camera_width'], game['camera_height'], game)
 
             game['fov_recompute'] = False
 
             libtcod.console_flush()
 
-            clear_all(game['con'], game['entities'])
+            clear_all(game['con'], game['entities'], game)
 
             if game['game_state'] == GameStates.PLAYER_TURN:
                 action = handle_playerturn_keys(game['key'])

@@ -66,7 +66,8 @@ class GameMap:
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
                         # finally, append the new room to the list
-                self.place_entities(new_room, entities, min_monsters_per_room, max_monsters_per_room)
+                # TODO remove to add enemeies back in
+                # self.place_entities(new_room, entities, min_monsters_per_room, max_monsters_per_room)
                 rooms.append(new_room)
                 num_rooms += 1
 

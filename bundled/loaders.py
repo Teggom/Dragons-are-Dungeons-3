@@ -13,12 +13,12 @@ def load_preamble(game, VERSION):
     game['screen_height'] = 50
 
     # Map size( Can change )
-    game['map_width'] = 80
-    game['map_height'] = 44
+    game['map_width'] = 120#80
+    game['map_height'] = 120#44
 
     # Camera Size 
     game['camera_width'] = game['screen_width']
-    game['camera_height'] = game['screen_height']-1
+    game['camera_height'] = game['screen_height']
     
     game['fov_algorithm'] = 4
     game['fov_light_walls'] = True
@@ -54,6 +54,8 @@ def load_gamestart(game, race, clss):
     game['max_rooms'] = 100 # 30
     game['fov_recompute'] = True
     game['player'] = Entity(int(game['screen_width'] / 2), int(game['screen_height'] / 2), '@', libtcod.white, race+" "+clss, race, inventory=Inventory(gold=20))
+    game['camera_x'] = game['player'].x
+    game['camera_y'] = game['player'].y
     npc = Entity(int(game['screen_width'] / 2 - 5), int(game['screen_height'] / 2), '@', libtcod.red, "Human Merchant", "Human", blocks = True, ai=BasicMerchant())
     npc2 = Entity(int(game['screen_width'] / 2 + 5), int(game['screen_height'] / 2 + 5), '@', libtcod.green, "Lost Elf", "Elf", blocks = True, ai=Wander(), traits=[], inventory=Inventory(gold=-1))
     game['entities'] = [game['player'], npc, npc2]

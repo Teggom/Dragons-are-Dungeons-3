@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [0.0.8] - 2022-04-13
+
+### Added
+- Larger, scrolling maps
+  - Game is now rendered from the camera view
+
+### Changed
+- Removed monsters for the time being
+  - Until they can be killed, they block paths
+
 ## [0.0.7] - 2022-04-11
 
 ### Added
