@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.0.9] - 2022-04-14
+
+### Added
+- Top Banner
+  - Shows you some menus you can bring up, as well as the button for those menus
+- Ground Menu [g]
+  - Displays things at your feet
+  - Will eventually perform a search check as well
+  - Buttons
+    - Arrow keys to move
+    - enter to pick up item
+    - esc/g to back out to the game
+- Equipment Menu [e]
+  - Two screens, shows your currently worn items
+    - Needs to show stat changes as well (TODO)
+  - Buttons
+    - Arrow Keys to move
+    - Right arrow key or Enter will access bag for highlighted gear slot
+      - Arrow keys to move
+      - Enter to equip
+    - d will drop or unequip an item depending on what screen you're on
+      - BUGGED
+    - Equipment will be displayed as stacked if multiple exist
+    - Currently no way to sort
+    - Windows scale with number of items in bag
+      - Will be rolled out and page up/down will be used to scroll through bags
+- Inventory (No menus or handling set up)
+- Map (No menus or handling set up)
+- Need to add "Character [c]" Screen
+
+
+
+
+
 
 ## [0.0.8] - 2022-04-13
 

@@ -4,6 +4,8 @@ from entity import Entity
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 from unit_components.ai import BasicMonster
+from bundled.item_loader import place_item, make_item
+from random import sample
 
 class GameMap:
     def __init__(self, width, height):
@@ -16,9 +18,15 @@ class GameMap:
 
         return tiles
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, min_monsters_per_room, max_monsters_per_room):
+    #def place_items(self, game, num = 100):
+        
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, min_monsters_per_room, max_monsters_per_room, game):
         rooms = []
         num_rooms = 0
+
+        for i in range(100):
+            new_item = make_item(sample(['Sword', 'Amulet', 'Glove', 'Item'], 1)[0])
+            place_item(new_item, game)
 
         for r in range(max_rooms):
             # random width and height
@@ -68,9 +76,11 @@ class GameMap:
                         # finally, append the new room to the list
                 # TODO remove to add enemeies back in
                 # self.place_entities(new_room, entities, min_monsters_per_room, max_monsters_per_room)
+                
                 rooms.append(new_room)
                 num_rooms += 1
-
+    
+    
     def create_room(self, room):
         # go through the tiles in the rectangle and make them passable
         for x in range(room.x1 + 1, room.x2):
@@ -85,6 +95,7 @@ class GameMap:
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[x][y].update_tile(False, "Floor", x, y, block_sight = False)
 
+    
     def place_entities(self, room, entities, min_monsters_per_room, max_monsters_per_room):
         # Get a random number of monsters
         number_of_monsters = randint(min_monsters_per_room, max_monsters_per_room)

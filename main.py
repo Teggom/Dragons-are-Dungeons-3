@@ -1,11 +1,13 @@
 import libtcodpy as libtcod
 from time import sleep
+from bundled.item_loader import place_item, remove_item_from_map
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
-from input_handlers import handle_charselect_keys, handle_mainmenu_keys, handle_playerturn_keys
+from helper_funcs import gear_lookup, get_items_at_loc
+from input_handlers import handle_charselect_keys, handle_equipment_menu_keys, handle_ground_menu_keys, handle_mainmenu_keys, handle_playerturn_keys
 from map_objects.game_map import GameMap
-from menus import main_menu, char_select_menu
-from render_functions import clear_all, render_all, render_animations
+from menus import equipment_menu, ground_menu, main_menu, char_select_menu, menu_strip
+from render_functions import clear_all, render_all, render_animations, render_base_screen
 from game_states import GameStates
 from animations import animation
 from unit_components.ai import BasicMerchant, Wander
@@ -14,8 +16,9 @@ from unit_components.inventory import Inventory
 from unit_components.item import Item
 from unit_components.stat_mod import trait
 from pprint import pprint
-from bundled.loaders import load_charselect, load_gamestart, load_preamble, load_mainmenu
-VERSION = "0.0.8"
+from time import sleep
+from bundled.loaders import load_charselect, load_equipment_menu, load_gamestart, load_ground_menu, load_inventory_menu, load_preamble, load_mainmenu
+VERSION = "0.0.9"
 game = {}
 
 def main():
@@ -36,7 +39,8 @@ def main():
     while not libtcod.console_is_window_closed():
         action = {}
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, game['key'], game['mouse'])
-        
+        #sleep(.1)
+        #print(game['game_state'])
         if game['game_state'] == GameStates.CHARACTER_SELECT:
             char_select_menu(game['con'], game)
             libtcod.console_flush()
@@ -68,9 +72,87 @@ def main():
                         race=list(game['options'].keys())[game['cursor_0']],
                         clss=game['options'][list(game['options'].keys())[game['cursor_0']]][game['cursor_1']]
                     )
+        
+        elif game['game_state'] == GameStates.EQUIPMENT_MENU:
+            
+            render_base_screen(game)
+            equipment_menu(game['con'], game)
+            libtcod.console_flush()
+            clear_all(game['con'], game['entities'], game)
+
+            action = handle_equipment_menu_keys(game['key'])
+
+            move = action.get('move')
+            select = action.get('select')
+            exit = action.get('exit')
+            back = action.get('back')
+            drop = action.get('drop')
+
+            if move:
+                if game['cursor_spot'] == 0:
+                    game['cursor_0'] = ( game['cursor_0'] + move ) % 12
+                elif game['cursor_spot'] == 1:
+                    game['cursor_1'] = ( game['cursor_1'] + move ) % len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])])
+            if select:
+                if game['cursor_spot'] == 0:
+                    if len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]) > 0:
+                        game['cursor_spot'] = 1
+                elif game['cursor_spot'] == 1:
+                    selected_item = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']]
+                    game['player'].inventory.equip_item(selected_item, position = game['slot_names'][game['cursor_0']])
+                    game['cursor_spot'] = 0
+                    game['cursor_1'] = 0
+            if back:
+                if game['cursor_spot'] == 1:
+                    game['cursor_spot'] = 0
+                    game['cursor_1'] = 0
+            if exit:
+                game['game_state'] = GameStates.PLAYER_TURN
+                game['option'] = -1
+            if drop:
+                if game['cursor_spot'] == 0:
+                    # unequip to bag
+                    game['player'].inventory.unequip(game['slot_names'][game['cursor_0']])
+                elif game['cursor_spot'] == 1:
+                    # drop
+                    selected_item = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].copy_self()
+                    place_item(selected_item, game['player'].x, game['player'].y)
+                    game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].quantity -= 1
+                    if game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].quantity <=0:
+                        game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])].remove(
+                            game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']]
+                        )
+                    game['cursor_1'] -= 1
+                    if game['cursor_1'] < 0:
+                        game['cursor_1'] = 0
+                    if len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]) <= 0:
+                        game['cursor_spot'] = 0
             
 
-        if game['game_state'] == GameStates.MAIN_MENU:
+        elif game['game_state'] == GameStates.GROUND_MENU:
+            items = get_items_at_loc(game, game['player'].x, game['player'].y)
+            render_base_screen(game)
+            ground_menu(game['con'], game, items)
+            libtcod.console_flush()
+            clear_all(game['con'], game['entities'], game)
+
+            action = handle_ground_menu_keys(game['key'])
+
+            move = action.get('move')
+            select = action.get('select')
+            exit = action.get('exit')
+            
+            if move and len(items) > 0:
+                game['cursor'] = ( game['cursor'] + move ) % len(items)
+            if exit:
+                game['game_state'] = GameStates.PLAYER_TURN
+                game['option'] = -1
+            if select and len(items) > 0:
+                Selected = items[game['cursor']]
+                game['player'].inventory.get_item(Selected)
+                remove_item_from_map(Selected, game)
+
+        elif game['game_state'] == GameStates.MAIN_MENU:
             # RENDER MENU
             main_menu(game['con'], 'menu_background.png', game)
             libtcod.console_flush()
@@ -94,15 +176,8 @@ def main():
                     return True
 
         elif game['game_state'] == GameStates.PLAYER_TURN:
-            if game['fov_recompute']:
-                recompute_fov(game['fov_map'], game['player'].x, game['player'].y, game['player'].stats.sight, game['fov_light_walls'], game['fov_algorithm'])
-            render_all(game['con'], game['player'], game['entities'], game['game_map'], game['fov_map'], game['fov_recompute'],
-                 game['screen_width'], game['screen_height'], game['camera_width'], game['camera_height'], game)
-
-            game['fov_recompute'] = False
-
+            render_base_screen(game)
             libtcod.console_flush()
-
             clear_all(game['con'], game['entities'], game)
 
             if game['game_state'] == GameStates.PLAYER_TURN:
@@ -111,7 +186,16 @@ def main():
             move = action.get('move')
             exit = action.get('exit')
             fullscreen = action.get('fullscreen')
+            ground_menu_opened = action.get('ground_menu_opened')
+            equipment_menu_opened = action.get('equipment_menu_opened')
+            inventory_menu_opened = action.get('inventory_menu_opened')
 
+            if ground_menu_opened:
+                load_ground_menu(game)
+            if equipment_menu_opened:
+                load_equipment_menu(game)
+            if inventory_menu_opened:
+                load_inventory_menu(game)
             if move and game['game_state'] == GameStates.PLAYER_TURN:
                 dx, dy = move
                 destination_x = game['player'].x + dx

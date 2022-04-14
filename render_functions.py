@@ -1,5 +1,19 @@
 import libtcodpy as libtcod
 
+from fov_functions import recompute_fov
+from menus import menu_strip
+
+def render_base_screen(game):
+
+    if game['fov_recompute']:
+        recompute_fov(game['fov_map'], game['player'].x, game['player'].y, game['player'].stats.sight, game['fov_light_walls'], game['fov_algorithm'])
+
+    render_all(game['con'], game['player'], game['entities'], game['game_map'], game['fov_map'], game['fov_recompute'],
+            game['screen_width'], game['screen_height'], game['camera_width'], game['camera_height'], game)
+
+    game['fov_recompute'] = False
+
+    menu_strip(game['con'], game)
 
 def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, camera_width, camera_height, game):
     move_camera(game['player'].x, game['player'].y, game)
@@ -32,6 +46,11 @@ def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_w
                 if game_map.tiles[map_x][map_y].explored and not visible:
                     if game_map.tiles[map_x][map_y].step(player):
                         libtcod.console_set_char_background(con, x, y, game_map.tiles[map_x][map_y].get_color("Unseen"), libtcod.BKGND_SET)
+
+    # Draw all items
+    #print(len(game['items']))
+    for item in game['items']:
+        draw_item(con, item, fov_map, game)
 
     # Draw all entities in the list
     for entity in entities:
@@ -70,6 +89,8 @@ def to_camera_coordinates(x, y, game):
 def clear_all(con, entities, game):
     for entity in entities:
         clear_entity(con, entity, game)
+    for item in game['items']:
+        clear_item(con, item, game)
 
 def draw_entity(con, entity, fov_map, game):
     if libtcod.map_is_in_fov(fov_map, entity.x, entity.y):
@@ -78,6 +99,15 @@ def draw_entity(con, entity, fov_map, game):
             #set the color and then draw the character that represents this object at its position
             libtcod.console_set_default_foreground(con, entity.color)
             libtcod.console_put_char(con, x, y, entity.char, libtcod.BKGND_NONE)
+
+def draw_item(con, item, fov_map, game):
+    if libtcod.map_is_in_fov(fov_map, item.x, item.y):
+        (x, y) = to_camera_coordinates(item.x, item.y, game)
+        if x is not None:
+            #set the color and then draw the character that represents this object at its position
+            libtcod.console_set_default_foreground(con, item.color)
+            libtcod.console_put_char(con, x, y, item.char, libtcod.BKGND_NONE)
+
 
 def render_animations(con, animations, fov_map):
     for ani in animations:
@@ -88,6 +118,12 @@ def render_animations(con, animations, fov_map):
 
 def clear_entity(con, entity, game):
     (x, y) = to_camera_coordinates(entity.x, entity.y, game)
+    if x is not None:
+        # erase the character that represents this object
+        libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
+
+def clear_item(con, item, game):
+    (x, y) = to_camera_coordinates(item.x, item.y, game)
     if x is not None:
         # erase the character that represents this object
         libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)

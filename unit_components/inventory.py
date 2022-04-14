@@ -44,6 +44,11 @@ class Inventory:
         self.bag[got_item.type].append(got_item)
         return None
 
+    def unequip_item(self, position):
+        # removes item from slot and puts in bag
+        self.get_item(self.wearing[position])
+        self.wearing[position] = None
+
     def equip_item(self, e_item, position=None):
         # Requires Position if One Hand
         if e_item.type == "Weapon":
@@ -70,6 +75,7 @@ class Inventory:
 
         if position == None:
             position = e_item.type
+            
         if self.wearing[position] == None:
             # not wearing something
             self.wearing[position] = e_item.copy_self(1)

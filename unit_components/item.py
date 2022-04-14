@@ -4,15 +4,26 @@
 #   {"dice_rolls" : 2, "upper" : 6, "flat" : 3}
 #   sum(random.sample(range(upper), dice_rolls))+dice_rolls+flat
 class Item:
-    def __init__(self, name, type, traits = {}, stats = {}, damages = [], twohand = False, quantity = 1):
+    def __init__(self, name, type, char, color, x=None, y=None, traits = {}, stats = {}, damages = [], twohand = False, quantity = 1):
         self.name = name
         self.type = type
+        self.char = char
+        self.color = color
+        self.x = x
+        self.y = y
         self.traits = traits
         self.stats = stats
         self.damages = damages
         self.twohand = twohand
         self.quantity = quantity
         
+    @property
+    def q_name(self):
+        if self.quantity <= 1:
+            return(self.name)
+        else:
+            return(self.name + " x" + str(self.quantity))
+
     def copy_self(self, quantity = 1):
         n_item = Item(self.name, self.type, self.traits, self.stats, self.damages, self.twohand, quantity=quantity)
         n_item.owner = self.owner

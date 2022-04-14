@@ -1,4 +1,6 @@
 
+from random import sample
+from bundled.item_loader import make_item, place_item
 from entity import Entity
 from fov_functions import initialize_fov
 from game_states import GameStates
@@ -48,6 +50,7 @@ def load_charselect(game):
     }
 
 def load_gamestart(game, race, clss):
+    game['option'] = -1
     game['game_state'] = GameStates.PLAYER_TURN
     game['room_max_size'] = 10
     game['room_min_size'] = 5
@@ -59,8 +62,33 @@ def load_gamestart(game, race, clss):
     npc = Entity(int(game['screen_width'] / 2 - 5), int(game['screen_height'] / 2), '@', libtcod.red, "Human Merchant", "Human", blocks = True, ai=BasicMerchant())
     npc2 = Entity(int(game['screen_width'] / 2 + 5), int(game['screen_height'] / 2 + 5), '@', libtcod.green, "Lost Elf", "Elf", blocks = True, ai=Wander(), traits=[], inventory=Inventory(gold=-1))
     game['entities'] = [game['player'], npc, npc2]
+    game['items'] = []
     game['game_map'] = GameMap(game['map_width'], game['map_height'])
-    game['game_map'].make_map(game['max_rooms'], game['room_min_size'], game['room_max_size'], game['map_width'], game['map_height'], game['player'], game['entities'], 1, 1)
+    game['game_map'].make_map(game['max_rooms'], game['room_min_size'], game['room_max_size'], game['map_width'], game['map_height'], game['player'], game['entities'], 1, 1, game)
     game['fov_map'] = initialize_fov(game['game_map'])
+    game['slot_names'] = ['Head', "Neck", "Chest", "Back", "Left Arm", "Right Arm", "Left Hand", "Right Hand", "Belt", "Legs", "Left Foot", "Right Foot"]
 
+    for i in range(10):
+        new_item = make_item(sample(['Sword', 'Amulet', 'Glove', 'Item'], 1)[0])
+        place_item(new_item, game, game['player'].x+2, game['player'].y+2)
+        
+    
+def load_ground_menu(game):
+    game['game_state'] = GameStates.GROUND_MENU
+    game['cursor'] = 0
+    game['option'] = 0
 
+def load_equipment_menu(game):
+    game['game_state'] = GameStates.EQUIPMENT_MENU
+    game['cursor_0'] = 0
+    game['cursor_1'] = 0
+    game['cursor_spot'] = 0
+    game['option'] = 1
+
+def load_inventory_menu(game):
+    game['game_state'] = GameStates.INVENTORY_MENU
+    game['cursor_0'] = 0
+    game['cursor_1'] = 0
+    game['cursor_2'] = 0
+    game['cursor_spot'] = 0
+    game['option'] = 2
