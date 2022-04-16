@@ -79,7 +79,6 @@ class Inventory:
         if self.wearing[position] == None:
             # not wearing something
             self.wearing[position] = e_item.copy_self(1)
-            print(self.wearing[position] == e_item)
             e_item.quantity -= 1
             if e_item.quantity <= 0:
                 self.bag[e_item.type].remove(e_item)

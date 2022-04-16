@@ -1,5 +1,8 @@
+from unit_components.leveling import level_tracker
+
+
 class stats():
-    def __init__(self, unit_type="Human"):
+    def __init__(self, unit_type="Human", level_comp = level_tracker()):
         # Rather than set these below, set them here.
         #  helps keep track of what I have and have not defined
         stat_package = self.get_stat_package(unit_type)
@@ -10,17 +13,29 @@ class stats():
         self.curr_mp = stat_package['base_mp']
         
         # Core Stats
-        self.base_strength = stat_package['base_strength']
-        self.base_dexterity = stat_package['base_dexterity']
-        self.base_intelligence = stat_package['base_intelligence']
-        self.base_charisma = stat_package['base_charisma']
-        self.base_wisdom = stat_package['base_wisdom']
+        
+        # self.base_strength = stat_package['base_strength']
+        # self.base_dexterity = stat_package['base_dexterity']
+        # self.base_intelligence = stat_package['base_intelligence']
+        # self.base_charisma = stat_package['base_charisma']
+        # self.base_wisdom = stat_package['base_wisdom']
         
         # Secondary Stats
         self.base_luck = stat_package['base_luck']
         self.base_memory = stat_package['base_memory']
         self.base_sight = stat_package['base_sight']
         self.base_perception = stat_package['base_perception']
+
+        # TODO CHANGE THIS, it's overriding the parameters passed in
+        self.level_tracker = level_tracker(
+            strength = stat_package['base_strength'],
+            dexterity = stat_package['base_dexterity'],
+            intelligence = stat_package['base_intelligence'],
+            wisdom = stat_package['base_wisdom'],
+            charisma = stat_package['base_charisma']
+        )
+        self.level_tracker.owner = self
+        
     
     # # # # # #
     # Skills  #
@@ -30,16 +45,127 @@ class stats():
     @property
     def athletics(self):
         Bonus = self.get_skill_mod(self.strength)
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['athletics']['level'])
         Bonus += self.skill_check_condition("athletics")
         Bonus += self.skill_check_traits("athletics")
         Bonus += self.skill_check_equipment("athletics")
-        return(max(0, Bonus))
-    
-    # Dex
-    # Int
-    # Wis
-    # Cha
+        return(Bonus)
+        #return(max(0, Bonus))
 
+    
+    @property
+    def acrobatics(self):
+        Bonus = self.get_skill_mod(int(self.dexterity*.5) + int(self.strength*.5))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['acrobatics']['level'])
+        Bonus += self.skill_check_condition("acrobatics")
+        Bonus += self.skill_check_traits("acrobatics")
+        Bonus += self.skill_check_equipment("acrobatics")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+
+    # Dex
+    @property
+    def slight_of_hand(self):
+        Bonus = self.get_skill_mod(self.dexterity)
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['slight_of_hand']['level'])
+        Bonus += self.skill_check_condition("slight_of_hand")
+        Bonus += self.skill_check_traits("slight_of_hand")
+        Bonus += self.skill_check_equipment("slight_of_hand")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+
+    @property
+    def stealth(self):
+        Bonus = self.get_skill_mod(int(self.dexterity*.75) + int(self.wisdom*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['stealth']['level'])
+        Bonus += self.skill_check_condition("stealth")
+        Bonus += self.skill_check_traits("stealth")
+        Bonus += self.skill_check_equipment("stealth")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+    
+    # Int
+    @property
+    def arcana(self):
+        Bonus = self.get_skill_mod(self.intelligence)
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['arcana']['level'])
+        Bonus += self.skill_check_condition("arcana")
+        Bonus += self.skill_check_traits("arcana")
+        Bonus += self.skill_check_equipment("arcana")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+    
+    @property
+    def alchemy(self):
+        Bonus = self.get_skill_mod(int(self.intelligence*.75) + int(self.wisdom*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['alchemy']['level'])
+        Bonus += self.skill_check_condition("alchemy")
+        Bonus += self.skill_check_traits("alchemy")
+        Bonus += self.skill_check_equipment("alchemy")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+    
+    # Wis
+    @property
+    def crafting(self):
+        Bonus = self.get_skill_mod(int(self.wisdom*.75) + int(self.dexterity*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['crafting']['level'])
+        Bonus += self.skill_check_condition("crafting")
+        Bonus += self.skill_check_traits("crafting")
+        Bonus += self.skill_check_equipment("crafting")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+    
+
+    # Cha
+    @property
+    def bartering(self):
+        Bonus = self.get_skill_mod(self.charisma)
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['bartering']['level'])
+        Bonus += self.skill_check_condition("bartering")
+        Bonus += self.skill_check_traits("bartering")
+        Bonus += self.skill_check_equipment("bartering")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+
+    @property
+    def persuasion(self):
+        Bonus = self.get_skill_mod(int(self.charisma*.75) + int(self.wisdom*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['persuasion']['level'])
+        Bonus += self.skill_check_condition("persuasion")
+        Bonus += self.skill_check_traits("persuasion")
+        Bonus += self.skill_check_equipment("persuasion")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+    
+    @property
+    def intimidation(self):
+        Bonus = self.get_skill_mod(int(self.charisma*.75) + int(self.strength*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['intimidation']['level'])
+        Bonus += self.skill_check_condition("intimidation")
+        Bonus += self.skill_check_traits("intimidation")
+        Bonus += self.skill_check_equipment("intimidation")
+        return(Bonus)
+        #return(max(0, Bonus))
+
+    
+    @property
+    def deception(self):
+        Bonus = self.get_skill_mod(int(self.charisma*.75) + int(self.intelligence*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['deception']['level'])
+        Bonus += self.skill_check_condition("deception")
+        Bonus += self.skill_check_traits("deception")
+        Bonus += self.skill_check_equipment("deception")
+        return(Bonus)
+        #return(max(0, Bonus))
 
 
 
@@ -84,6 +210,7 @@ class stats():
     # # # # # # # #
     # Core Stats  #
     # # # # # # # #
+
     @property
     def strength(self):
         total = self.base_strength
@@ -159,7 +286,6 @@ class stats():
         total += self.check_equipment("sight")
         return(max(1, total))
     
-    # TO MOVE
     @property
     def perception(self):
         total = self.base_perception
@@ -167,6 +293,40 @@ class stats():
         total += self.check_traits("perception")
         total += self.check_equipment("perception")
         return(max(0, total))
+
+
+
+
+
+    # Base stat declare
+    
+    @property
+    def base_strength(self):
+        return(self.level_tracker.levels['strength']['level'])
+        
+    @property
+    def base_dexterity(self):
+        return(self.level_tracker.levels['dexterity']['level'])
+
+    @property
+    def base_intelligence(self):
+        return(self.level_tracker.levels['intelligence']['level'])
+
+    @property
+    def base_wisdom(self):
+        return(self.level_tracker.levels['wisdom']['level'])
+
+    @property
+    def base_charisma(self):
+        return(self.level_tracker.levels['charisma']['level'])
+    
+    # @property
+    # def speed(self):
+    #     total = self.base_speed
+    #     total += self.check_condition("speed")
+    #     total += self.check_traits("speed")
+    #     total += self.check_equipment("speed")
+    #     return(max(1, total))
 
     def get_stat_package(self, unit_type):
         if unit_type == "Human":
@@ -288,7 +448,12 @@ class stats():
         return(total)
 
     def check_equipment(self, stat):
-        return(0)
+        total = 0
+        for gear_slot in self.owner.inventory.wearing.keys():
+            if self.owner.inventory.wearing[gear_slot]:
+                if self.owner.inventory.wearing[gear_slot].stats.get(stat):
+                    total += self.owner.inventory.wearing[gear_slot].stats.get(stat)
+        return(total)
 
 
 
@@ -310,7 +475,12 @@ class stats():
         return(total)
 
     def skill_check_equipment(self, skill):
-        return(0)
+        total = 0
+        for gear_slot in self.owner.inventory.wearing.keys():
+            if self.owner.inventory.wearing[gear_slot]:
+                if self.owner.inventory.wearing[gear_slot].stats.get(skill):
+                    total += self.skill_level_to_bonus(self.owner.inventory.wearing[gear_slot].stats.get(skill))
+        return(total)
     
 
 

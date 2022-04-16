@@ -4,26 +4,61 @@ from entity import Entity
 from random import sample
 import tcod as libtcod
 def make_item(name):
-    additional_name = sample([' of Fire', '', ' of Ice', 
-        " of Sight", ' of Blinding', ' of Strength'], 1)[0]
-    if name == "Sword":
+
+    samp = sample([
+        ["", {}, {}],
+        [" of Strength", {}, {'strength' : 5}],
+        [" of Sight", {}, {'sight' : 1}],
+        [' of Memory', {}, {'memory' : 3}],
+        [' of Blinding', {}, {'sight' : -3}],
+        [' of Stupidity', {}, {'memory' : -10}],
+        [' of Luck', {}, {'luck' : 1}]
+    ], 1)[0]
+    
+
+    if name == 1:
         return(Item(
-            "Sword" + additional_name, "Weapon", "/", libtcod.gray,
+            "Sword" + samp[0], "Weapon", "/", libtcod.gray, traits = samp[1], stats = samp[2],
             damages=[Damage("1d6+3")]
         ))
-    if name == "Amulet":
+    if name == 2:
         return(Item(
-            "Amulet" + additional_name, "Neck", "o", libtcod.white,
-            traits={"Memory" : 5}
+            "Axe" + samp[0], "Weapon", "7", libtcod.gray, traits=samp[1], stats = samp[2],
+             damages=[Damage("2d6+3")], twohand=True 
         ))
-    if name == "Glove":
+    if name == 3:
         return(Item(
-            "Leather Glove" + additional_name, "Arm", "m", libtcod.Color(165, 103, 69),
+            "Helmet" + samp[0], "Head", "H", libtcod.gray, traits=samp[1], stats = samp[2]
         ))
-    if name == "Item":
+    if name == 4:
+        return(Item(
+            "Chestplate" + samp[0], "Chest", "M", libtcod.gray, traits=samp[1], stats = samp[2]
+        ))
+    if name == 5:
+        return(Item(
+            "Cape" + samp[0], "Back", "4", libtcod.gray, traits=samp[1], stats = samp[2]
+        ))
+    if name == 6:
+        return(Item(
+            "Iron Bracer" + samp[0], "Arm", "z", libtcod.gray, traits=samp[1], stats = samp[2]
+        ))
+    if name == 7:
+        return(Item(
+            "Leather Belt" + samp[0], "Belt", "-", libtcod.gray, traits=samp[1], stats = samp[2]
+        ))
+    if name == 8:
+        return(Item(
+            "Pants" + samp[0], "Legs", "V", libtcod.gray, traits=samp[1], stats = samp[2]
+        ))
+    if name == 9:
+        return(Item(
+            "Shoe" + samp[0], "Feet", "b", libtcod.gray, traits=samp[1], stats = samp[2]
+        ))
+    
+    if name == 0:
         return(Item(
             "Throwing Axe", "Item", "p", libtcod.silver,
-            damages=[Damage("1d4")]
+            damages=[Damage("1d4")], quantity=sample([1, 2, 3, 4, 5], 1)[0]
         ))
     pass
 

@@ -25,7 +25,7 @@ class Item:
             return(self.name + " x" + str(self.quantity))
 
     def copy_self(self, quantity = 1):
-        n_item = Item(self.name, self.type, self.traits, self.stats, self.damages, self.twohand, quantity=quantity)
+        n_item = Item(self.name, self.type, self.char, self.color, self.x, self.y, self.traits, self.stats, self.damages, self.twohand, quantity=quantity)
         n_item.owner = self.owner
         return(n_item)
     

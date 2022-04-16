@@ -39,8 +39,6 @@ def main():
     while not libtcod.console_is_window_closed():
         action = {}
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, game['key'], game['mouse'])
-        #sleep(.1)
-        #print(game['game_state'])
         if game['game_state'] == GameStates.CHARACTER_SELECT:
             char_select_menu(game['con'], game)
             libtcod.console_flush()
@@ -112,11 +110,11 @@ def main():
             if drop:
                 if game['cursor_spot'] == 0:
                     # unequip to bag
-                    game['player'].inventory.unequip(game['slot_names'][game['cursor_0']])
+                    game['player'].inventory.unequip_item(game['slot_names'][game['cursor_0']])
                 elif game['cursor_spot'] == 1:
                     # drop
                     selected_item = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].copy_self()
-                    place_item(selected_item, game['player'].x, game['player'].y)
+                    place_item(selected_item, game, game['player'].x, game['player'].y)
                     game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].quantity -= 1
                     if game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].quantity <=0:
                         game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])].remove(

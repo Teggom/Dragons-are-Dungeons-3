@@ -11,12 +11,12 @@ import tcod as libtcod
 
 def load_preamble(game, VERSION):
     # Size of window
-    game['screen_width'] = 80
-    game['screen_height'] = 50
+    game['screen_width'] = 130
+    game['screen_height'] = 60
 
     # Map size( Can change )
-    game['map_width'] = 120#80
-    game['map_height'] = 120#44
+    game['map_width'] = 150#80
+    game['map_height'] = 90#44
 
     # Camera Size 
     game['camera_width'] = game['screen_width']
@@ -69,7 +69,7 @@ def load_gamestart(game, race, clss):
     game['slot_names'] = ['Head', "Neck", "Chest", "Back", "Left Arm", "Right Arm", "Left Hand", "Right Hand", "Belt", "Legs", "Left Foot", "Right Foot"]
 
     for i in range(10):
-        new_item = make_item(sample(['Sword', 'Amulet', 'Glove', 'Item'], 1)[0])
+        new_item = make_item(sample([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 1)[0])
         place_item(new_item, game, game['player'].x+2, game['player'].y+2)
         
     

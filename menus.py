@@ -1,3 +1,4 @@
+import enum
 import tcod as libtcod
 
 from helper_funcs import gear_lookup
@@ -59,7 +60,7 @@ def equipment_menu(con, game):
             libtcod.console_print_ex(slot_window, 13, i+1, libtcod.BKGND_SET, libtcod.LEFT, NO_EQUIP+r_padding*" ")
 
 
-    libtcod.console_blit(slot_window, 0, -1, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
+    libtcod.console_blit(slot_window, -1, -2, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
 
     # BAG
     using_bag = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]
@@ -90,9 +91,245 @@ def equipment_menu(con, game):
                 libtcod.console_set_default_background(bag_window, libtcod.black)
             libtcod.console_print_ex(bag_window, 1, i+1, libtcod.BKGND_SET, libtcod.LEFT, v.q_name+r_padding*" ")
             
+    # puts it under the main window
+    #libtcod.console_blit(bag_window, 0, -15, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
+    # puts it to the right of the main window
+    libtcod.console_blit(bag_window, -slot_width-2, -2, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
 
-    libtcod.console_blit(bag_window, 0, -15, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
+    chara_height = 30
+    chara_width = 80
+    chara_window = libtcod.console_new(chara_width, chara_height)
 
+    skill_box_drop = 14
+
+    libtcod.console_print_frame(chara_window, 0, 0, chara_width, chara_height, True, fmt="Character")
+    libtcod.console_print_frame(chara_window, 1, 1, chara_width-2, skill_box_drop, True)
+    libtcod.console_print_frame(chara_window, 1, skill_box_drop+1, chara_width-2, chara_height-skill_box_drop-2, True)
+
+
+    first_indent = 15
+    second_indent = 22
+    third_indent = 32
+    fourth_indent = 46
+    fifth_indent = 76
+
+    health_drop = 3
+    mana_drop = 4
+    p_stat_start_drop = 5
+    s_stat_start_drop = 10
+
+
+
+    libtcod.console_set_default_foreground(chara_window, libtcod.black)
+    libtcod.console_set_default_background(chara_window, libtcod.lighter_gray)
+
+    libtcod.console_print_ex(chara_window, 2, health_drop-1, libtcod.BKGND_SET, libtcod.LEFT, " "*(chara_width-4))
+    libtcod.console_print_ex(chara_window, first_indent, health_drop-1, libtcod.BKGND_SET, libtcod.RIGHT, "Stat")
+    libtcod.console_print_ex(chara_window, second_indent, health_drop-1, libtcod.BKGND_SET, libtcod.RIGHT, "Level")
+    libtcod.console_print_ex(chara_window, third_indent, health_drop-1, libtcod.BKGND_SET, libtcod.LEFT, "Equip Bonus")
+    libtcod.console_print_ex(chara_window, fourth_indent, health_drop-1, libtcod.BKGND_SET, libtcod.LEFT, "Buffs")
+    libtcod.console_print_ex(chara_window, fifth_indent, health_drop-1, libtcod.BKGND_SET, libtcod.RIGHT, "Total")
+    
+    for i in range(11):
+        if i % 2 == 0:
+            libtcod.console_set_default_background(chara_window, libtcod.black)
+        else:
+            libtcod.console_set_default_background(chara_window, libtcod.darkest_gray) 
+        libtcod.console_print_ex(chara_window, 2, health_drop+i, libtcod.BKGND_SET, libtcod.LEFT, ' '*(chara_width-4))
+
+    libtcod.console_set_default_foreground(chara_window, libtcod.lighter_gray)
+    libtcod.console_set_default_background(chara_window, libtcod.black)
+
+    
+    # To_Print_1 = ['Max Health', 'Max Mana', "Strength", "Dexterity", "Intelligence", "Wisdom", "Charisma", "Luck", "Memory", "Sight", "Perception"]
+    # for i, v in enumerate(To_Print_1):
+    #     if i % 2 == 0:
+    #         libtcod.console_set_default_background(chara_window, libtcod.black)
+    #     else:
+    #         libtcod.console_set_default_background(chara_window, libtcod.darkest_gray) 
+    #     libtcod.console_print_ex(chara_window, first_indent, health_drop+i, libtcod.BKGND_SET, libtcod.RIGHT, v)
+
+    libtcod.console_print_ex(chara_window, first_indent, health_drop, libtcod.BKGND_ADD, libtcod.RIGHT, "Max Health")
+    libtcod.console_print_ex(chara_window, first_indent, mana_drop, libtcod.BKGND_ADD, libtcod.RIGHT, "Max Mana")
+    libtcod.console_print_ex(chara_window, first_indent, p_stat_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, "Strength")
+    libtcod.console_print_ex(chara_window, first_indent, p_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, "Dexterity")
+    libtcod.console_print_ex(chara_window, first_indent, p_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, "Intelligence")
+    libtcod.console_print_ex(chara_window, first_indent, p_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, "Wisdom")
+    libtcod.console_print_ex(chara_window, first_indent, p_stat_start_drop+4, libtcod.BKGND_ADD, libtcod.RIGHT, "Charisma")
+    libtcod.console_print_ex(chara_window, first_indent, s_stat_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, "Luck")
+    libtcod.console_print_ex(chara_window, first_indent, s_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, "Memory")
+    libtcod.console_print_ex(chara_window, first_indent, s_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, "Sight")
+    libtcod.console_print_ex(chara_window, first_indent, s_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, "Perception")
+
+    libtcod.console_print_ex(chara_window, second_indent, health_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_hp))
+    libtcod.console_print_ex(chara_window, second_indent, mana_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_mp))
+    libtcod.console_print_ex(chara_window, second_indent, p_stat_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_strength))
+    libtcod.console_print_ex(chara_window, second_indent, p_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_dexterity))
+    libtcod.console_print_ex(chara_window, second_indent, p_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_intelligence))
+    libtcod.console_print_ex(chara_window, second_indent, p_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_wisdom))
+    libtcod.console_print_ex(chara_window, second_indent, p_stat_start_drop+4, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_charisma))
+    libtcod.console_print_ex(chara_window, second_indent, s_stat_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_luck))
+    libtcod.console_print_ex(chara_window, second_indent, s_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_memory))
+    libtcod.console_print_ex(chara_window, second_indent, s_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_sight))
+    libtcod.console_print_ex(chara_window, second_indent, s_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.base_perception))
+
+    
+    libtcod.console_print_ex(chara_window, third_indent, health_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("hp")))
+    libtcod.console_print_ex(chara_window, third_indent, mana_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("mp")))
+    libtcod.console_print_ex(chara_window, third_indent, p_stat_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("strength")))
+    libtcod.console_print_ex(chara_window, third_indent, p_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("dexterity")))
+    libtcod.console_print_ex(chara_window, third_indent, p_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("intelligence")))
+    libtcod.console_print_ex(chara_window, third_indent, p_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("wisdom")))
+    libtcod.console_print_ex(chara_window, third_indent, p_stat_start_drop+4, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("charisma")))
+    libtcod.console_print_ex(chara_window, third_indent, s_stat_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("luck")))
+    libtcod.console_print_ex(chara_window, third_indent, s_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("memory")))
+    libtcod.console_print_ex(chara_window, third_indent, s_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("sight")))
+    libtcod.console_print_ex(chara_window, third_indent, s_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_equipment("perception")))
+
+    
+    libtcod.console_print_ex(chara_window, fourth_indent, health_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("hp")+game['player'].stats.check_traits("hp")))
+    libtcod.console_print_ex(chara_window, fourth_indent, mana_drop, libtcod.BKGND_ADD, libtcod.LEFT,  str(game['player'].stats.check_condition("mp")+game['player'].stats.check_traits("mp")))
+    libtcod.console_print_ex(chara_window, fourth_indent, p_stat_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("strength")+game['player'].stats.check_traits("strength")))
+    libtcod.console_print_ex(chara_window, fourth_indent, p_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("dexterity")+game['player'].stats.check_traits("dexterity")))
+    libtcod.console_print_ex(chara_window, fourth_indent, p_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("intelligence")+game['player'].stats.check_traits("intelligence")))
+    libtcod.console_print_ex(chara_window, fourth_indent, p_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("wisdom")+game['player'].stats.check_traits("wisdom")))
+    libtcod.console_print_ex(chara_window, fourth_indent, p_stat_start_drop+4, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("charisma")+game['player'].stats.check_traits("charisma")))
+    libtcod.console_print_ex(chara_window, fourth_indent, s_stat_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("luck")+game['player'].stats.check_traits("luck")))
+    libtcod.console_print_ex(chara_window, fourth_indent, s_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("memory")+game['player'].stats.check_traits("memory")))
+    libtcod.console_print_ex(chara_window, fourth_indent, s_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("sight")+game['player'].stats.check_traits("sight")))
+    libtcod.console_print_ex(chara_window, fourth_indent, s_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.check_condition("perception")+game['player'].stats.check_traits("perception")))
+    #libtcod.console_print_ex(chara_window, 5, 5, libtcod.BKGND_SET, libtcod.LEFT, "Strength")
+
+    libtcod.console_print_ex(chara_window, fifth_indent, health_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.hp))
+    libtcod.console_print_ex(chara_window, fifth_indent, mana_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.mp))
+    libtcod.console_print_ex(chara_window, fifth_indent, p_stat_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.strength))
+    libtcod.console_print_ex(chara_window, fifth_indent, p_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.dexterity))
+    libtcod.console_print_ex(chara_window, fifth_indent, p_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.intelligence))
+    libtcod.console_print_ex(chara_window, fifth_indent, p_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.wisdom))
+    libtcod.console_print_ex(chara_window, fifth_indent, p_stat_start_drop+4, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.charisma))
+    libtcod.console_print_ex(chara_window, fifth_indent, s_stat_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.luck))
+    libtcod.console_print_ex(chara_window, fifth_indent, s_stat_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.memory))
+    libtcod.console_print_ex(chara_window, fifth_indent, s_stat_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.sight))
+    libtcod.console_print_ex(chara_window, fifth_indent, s_stat_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.perception))
+
+
+
+    
+    skill_first_indent = 15
+    skill_second_indent = 22
+    skill_third_indent = 25
+    skill_fourth_indent = 32
+    skill_fifth_indent = 46
+    skill_sixth_indent = 54
+    skill_seventh_indent = 76
+    skill_start_drop = skill_box_drop+3
+
+    libtcod.console_set_default_foreground(chara_window, libtcod.black)
+    libtcod.console_set_default_background(chara_window, libtcod.lighter_gray)
+
+    libtcod.console_print_ex(chara_window, 2, skill_start_drop-1, libtcod.BKGND_SET, libtcod.LEFT, " "*(chara_width-4))
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop-1, libtcod.BKGND_SET, libtcod.RIGHT, "Skill")
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop-1, libtcod.BKGND_SET, libtcod.RIGHT, "Level")
+    libtcod.console_print_ex(chara_window, skill_third_indent-1, skill_start_drop-1, libtcod.BKGND_SET, libtcod.LEFT, "(Bonus)")
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop-1, libtcod.BKGND_SET, libtcod.LEFT, "Equip Bonus")
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop-1, libtcod.BKGND_SET, libtcod.LEFT, "Buffs")
+    libtcod.console_print_ex(chara_window, skill_sixth_indent-1, skill_start_drop-1, libtcod.BKGND_SET, libtcod.LEFT, "Stat Bonus")
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop-1, libtcod.BKGND_SET, libtcod.RIGHT, "Total Bonus")
+
+    for i in range(11):
+        if i % 2 == 0:
+            libtcod.console_set_default_background(chara_window, libtcod.black)
+        else:
+            libtcod.console_set_default_background(chara_window, libtcod.darkest_gray) 
+        libtcod.console_print_ex(chara_window, 2, skill_start_drop+i, libtcod.BKGND_SET, libtcod.LEFT, ' '*(chara_width-4))
+
+    libtcod.console_set_default_foreground(chara_window, libtcod.lighter_gray)
+    libtcod.console_set_default_background(chara_window, libtcod.black)
+
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, "Athletics")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, "Acrobatics")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, "Slight of Hand")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, "Stealth")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.RIGHT, "Arcana")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.RIGHT, "Alchemy")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.RIGHT, "Crafting")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.RIGHT, "Bartering")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.RIGHT, "Persuasion")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.RIGHT, "Intimidation")
+    libtcod.console_print_ex(chara_window, skill_first_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.RIGHT, "Deception")
+
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['athletics']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['acrobatics']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['slight_of_hand']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['stealth']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['arcana']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['alchemy']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['crafting']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['bartering']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['persuasion']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['intimidation']['level']))
+    libtcod.console_print_ex(chara_window, skill_second_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.level_tracker.levels['deception']['level']))
+
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['athletics']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['acrobatics']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['slight_of_hand']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['stealth']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['arcana']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['alchemy']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['crafting']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['bartering']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['persuasion']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['intimidation']['level'])))
+    libtcod.console_print_ex(chara_window, skill_third_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_level_to_bonus(game['player'].stats.level_tracker.levels['deception']['level'])))
+    
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("athletics")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("acrobatics")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("slight_of_hand")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("stealth")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("arcana")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("alchemy")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("crafting")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("bartering")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("persuasion")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("intimidation")))
+    libtcod.console_print_ex(chara_window, skill_fourth_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_equipment("deception")))
+    
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("athletics")+game['player'].stats.skill_check_traits("athletics")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("acrobatics")+game['player'].stats.skill_check_traits("acrobatics")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("slight_of_hand")+game['player'].stats.skill_check_traits("slight_of_hand")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("stealth")+game['player'].stats.skill_check_traits("stealth")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("arcana")+game['player'].stats.skill_check_traits("arcana")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("alchemy")+game['player'].stats.skill_check_traits("alchemy")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("crafting")+game['player'].stats.skill_check_traits("crafting")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("bartering")+game['player'].stats.skill_check_traits("bartering")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("persuasion")+game['player'].stats.skill_check_traits("persuasion")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("intimidation")+game['player'].stats.skill_check_traits("intimidation")))
+    libtcod.console_print_ex(chara_window, skill_fifth_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.skill_check_condition("deception")+game['player'].stats.skill_check_traits("deception")))
+    
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.strength)))) # athletics
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.strength*.5) + int(game['player'].stats.dexterity*.5)))) # acrobatics
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.dexterity))))# slight_of_hand 
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.dexterity*.75) + int(game['player'].stats.wisdom*.25)))) # stealth 
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.intelligence))))# arcana 
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.intelligence*.75) + int(game['player'].stats.wisdom*.25))))# alchemy 
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.wisdom*.75) + int(game['player'].stats.dexterity*.25))))# crafting
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma))))# bartering
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.75) + int(game['player'].stats.wisdom*.25))))# persuasion 
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.75) + int(game['player'].stats.strength*.25))))# intimidation 
+    libtcod.console_print_ex(chara_window, skill_sixth_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.LEFT, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.75) + int(game['player'].stats.intelligence*.25))))# deception
+    
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.athletics))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+1, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.acrobatics))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+2, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.slight_of_hand))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+3, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.stealth))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+4, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.arcana))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+5, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.alchemy))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+6, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.crafting))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+7, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.bartering))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+8, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.persuasion))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+9, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.intimidation))
+    libtcod.console_print_ex(chara_window, skill_seventh_indent, skill_start_drop+10, libtcod.BKGND_ADD, libtcod.RIGHT, str(game['player'].stats.deception))
+    libtcod.console_blit(chara_window, -1, -17, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
     pass
 
 def ground_menu(con, game, items):

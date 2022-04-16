@@ -19,9 +19,17 @@ Secondary Stats - do not have skills built off them
     Perception - How well can you identify things in the dungeon
 
 Characters also have skills, there are many skills. Skills gain exp
-    Athletics
-    Slight of Hand
-    ...
+    Athletics             1 Strength                
+    Acrobatics          1/2 Strength     + 1/2 Dexterity           
+    Slight of Hand        1 Dexterity
+    Stealth             3/4 Dexterity    + 1/4 Wisdom
+    Arcana                1 Intelligence 
+    Alchemy             3/4 Intelligence + 1/4 Wisdom
+    Crafting            3/4 Wisdom       + 1/4 Dexterity
+    Bartering             1 Charisma
+    Persuasion          3/4 Charisma     + 1/4 Wisdom
+    Intimidation        3/4 Charisma     + 1/4 Strength
+    Deception           3/4 Charisma     + 1/4 Intelligence
 
 
 Levels/Computations are as follows

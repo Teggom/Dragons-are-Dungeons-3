@@ -48,7 +48,6 @@ def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_w
                         libtcod.console_set_char_background(con, x, y, game_map.tiles[map_x][map_y].get_color("Unseen"), libtcod.BKGND_SET)
 
     # Draw all items
-    #print(len(game['items']))
     for item in game['items']:
         draw_item(con, item, fov_map, game)
 

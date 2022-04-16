@@ -25,7 +25,8 @@ class GameMap:
         num_rooms = 0
 
         for i in range(100):
-            new_item = make_item(sample(['Sword', 'Amulet', 'Glove', 'Item'], 1)[0])
+            new_item = make_item(sample([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 1)[0])
+            #print(new_item)
             place_item(new_item, game)
 
         for r in range(max_rooms):

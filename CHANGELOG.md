@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.10] - 2022-04-16
+
+### Added
+- 11 Skills
+  - Scaling in Stat and Skill Overview
+  - Athletics: Checks on physically doing something
+  - Acrobatics: Checks on body reactions
+  - Slight of Hand: From Stealing to grabbing items. Checks involving precision
+  - Stealth: Higher stealth -> Harder to be seen
+    - Counters Perception
+  - Arcana: Spellcasting checks for branch magic (not Cantrips)
+  - Alchemy: Liquid identification and creation checks
+  - Crafting: general crafting + workshop skill
+  - Bartering: Lowers prices at shops + more likeable
+  - Persuasion: Skill of convincing with Wisdom scaling
+  - Intimidation: Skill of convincing with Strength scaling
+  - Deception: Skill of convincing with Int scaling
+- Leveling
+  - All primary stats and skills can now level
+- Equipment menu now has screen with stats
+
+
+### Fixed
+- Dropping items from equipment menu behaves as expected
+  - And they end up below you on the map!
+- Unequiping items behaves as expected
+- Squashed annoying print message
 
 ## [0.0.9] - 2022-04-14
 

@@ -2,6 +2,8 @@ from unit_components.fighting_comp import stats
 from unit_components.ai import Wander, BasicMerchant, BasicMonster
 import math
 import tcod as libtcod
+
+
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
