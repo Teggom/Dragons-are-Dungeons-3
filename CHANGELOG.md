@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.11] - 2022-04-19
+
+### Added
+- Resistances
+  - Magic-Oriented
+    - Fire, Frost, Shock, Arcana, Poison, Holy, Unholy
+  - Physical-Oriented
+    - Blunt, Slash, Pierce
+  - Catchall
+    - Pure
+  - Equipment, Traits, Conditions can all apply resistances
+  - Formula for applying damage is ceiling(damage*(1-x/(x+20)))
+    - where x is your resistance
+    - negative resistance causes you to take extra damage
+- Page_up / Page_down
+  - Equipment menu bag
+  - Ground menu
+- Equipment menu now has item details screen
+  - Shows resistances, other stats, and placeholders for goodies
+  
+### Changed
+- HP and MP can now level
+  - MP exp is gained when spending mp
+  - HP exp is gained when taking damage before modifiers
+
+
 ## [0.0.10] - 2022-04-16
 
 ### Added

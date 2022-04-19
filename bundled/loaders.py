@@ -71,6 +71,9 @@ def load_gamestart(game, race, clss):
     for i in range(10):
         new_item = make_item(sample([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 1)[0])
         place_item(new_item, game, game['player'].x+2, game['player'].y+2)
+    for i in range(50):
+        new_item = make_item(sample([1, 2], 1)[0])
+        place_item(new_item, game, game['player'].x+2, game['player'].y+1)
         
     
 def load_ground_menu(game):

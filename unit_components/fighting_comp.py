@@ -1,16 +1,18 @@
 from unit_components.leveling import level_tracker
+from unit_components.resistances import resistance_comp
 
 
 class stats():
-    def __init__(self, unit_type="Human", level_comp = level_tracker()):
+    def __init__(self, unit_type="Human", level_comp = level_tracker(), resistances = resistance_comp()):
         # Rather than set these below, set them here.
         #  helps keep track of what I have and have not defined
         stat_package = self.get_stat_package(unit_type)
+        self.resistances = resistances
 
-        self.base_hp = stat_package['base_hp']
-        self.curr_hp = stat_package['base_hp']
-        self.base_mp = stat_package['base_mp']
-        self.curr_mp = stat_package['base_mp']
+        # self.base_hp = stat_package['base_hp']
+        # self.curr_hp = stat_package['base_hp']
+        # self.base_mp = stat_package['base_mp']
+        # self.curr_mp = stat_package['base_mp']
         
         # Core Stats
         
@@ -32,9 +34,13 @@ class stats():
             dexterity = stat_package['base_dexterity'],
             intelligence = stat_package['base_intelligence'],
             wisdom = stat_package['base_wisdom'],
-            charisma = stat_package['base_charisma']
+            charisma = stat_package['base_charisma'],
+            base_hp = stat_package['base_hp'],
+            base_mp = stat_package['base_mp']
         )
         self.level_tracker.owner = self
+        self.curr_hp = self.base_hp
+        self.curr_mp = self.base_mp
         
     
     # # # # # #
@@ -320,6 +326,14 @@ class stats():
     def base_charisma(self):
         return(self.level_tracker.levels['charisma']['level'])
     
+    @property
+    def base_hp(self):
+        return(int(self.level_tracker.levels['base_hp']['level']))
+    
+    @property
+    def base_mp(self):
+        return(int(self.level_tracker.levels['base_mp']['level']))
+    
     # @property
     # def speed(self):
     #     total = self.base_speed
@@ -435,24 +449,27 @@ class stats():
     # Can exceed 100? Doesn't help
     def check_traits(self, stat):
         total = 0
-        for trait in self.owner.traits:
-            if trait.modifiers.get(stat):
-                total += trait.modifiers.get(stat)
+        if self.owner.traits:
+            for trait in self.owner.traits:
+                if trait.modifiers.get(stat):
+                    total += trait.modifiers.get(stat)
         return(total)
 
     def check_condition(self, stat):
         total = 0
-        for condition in self.owner.conditions:
-            if condition.modifiers.get(stat):
-                total += condition.modifiers.get(stat)
+        if self.owner.conditions:
+            for condition in self.owner.conditions:
+                if condition.modifiers.get(stat):
+                    total += condition.modifiers.get(stat)
         return(total)
 
     def check_equipment(self, stat):
         total = 0
-        for gear_slot in self.owner.inventory.wearing.keys():
-            if self.owner.inventory.wearing[gear_slot]:
-                if self.owner.inventory.wearing[gear_slot].stats.get(stat):
-                    total += self.owner.inventory.wearing[gear_slot].stats.get(stat)
+        if self.owner.inventory:
+            for gear_slot in self.owner.inventory.wearing.keys():
+                if self.owner.inventory.wearing[gear_slot]:
+                    if self.owner.inventory.wearing[gear_slot].stats.get(stat):
+                        total += self.owner.inventory.wearing[gear_slot].stats.get(stat)
         return(total)
 
 
@@ -462,24 +479,27 @@ class stats():
     # Functions for skills, returns the base modifier without luck or d20
     def skill_check_traits(self, skill):
         total = 0
-        for trait in self.owner.traits:
-            if trait.modifiers.get(skill):
-                total += self.skill_level_to_bonus(trait.modifiers.get(skill))
+        if self.owner.traits:
+            for trait in self.owner.traits:
+                if trait.modifiers.get(skill):
+                    total += self.skill_level_to_bonus(trait.modifiers.get(skill))
         return(total)
 
     def skill_check_condition(self, skill):
         total = 0
-        for condition in self.owner.conditions:
-            if condition.modifiers.get(skill):
-                total += self.skill_level_to_bonus(condition.modifiers.get(skill))
+        if self.owner.conditions:
+            for condition in self.owner.conditions:
+                if condition.modifiers.get(skill):
+                    total += self.skill_level_to_bonus(condition.modifiers.get(skill))
         return(total)
 
     def skill_check_equipment(self, skill):
         total = 0
-        for gear_slot in self.owner.inventory.wearing.keys():
-            if self.owner.inventory.wearing[gear_slot]:
-                if self.owner.inventory.wearing[gear_slot].stats.get(skill):
-                    total += self.skill_level_to_bonus(self.owner.inventory.wearing[gear_slot].stats.get(skill))
+        if self.owner.inventory:
+            for gear_slot in self.owner.inventory.wearing.keys():
+                if self.owner.inventory.wearing[gear_slot]:
+                    if self.owner.inventory.wearing[gear_slot].stats.get(skill):
+                        total += self.skill_level_to_bonus(self.owner.inventory.wearing[gear_slot].stats.get(skill))
         return(total)
     
 

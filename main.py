@@ -18,7 +18,7 @@ from unit_components.stat_mod import trait
 from pprint import pprint
 from time import sleep
 from bundled.loaders import load_charselect, load_equipment_menu, load_gamestart, load_ground_menu, load_inventory_menu, load_preamble, load_mainmenu
-VERSION = "0.0.9"
+VERSION = "0.0.11"
 game = {}
 
 def main():
@@ -85,12 +85,48 @@ def main():
             exit = action.get('exit')
             back = action.get('back')
             drop = action.get('drop')
+            jump = action.get('jump')
 
             if move:
                 if game['cursor_spot'] == 0:
                     game['cursor_0'] = ( game['cursor_0'] + move ) % 12
                 elif game['cursor_spot'] == 1:
                     game['cursor_1'] = ( game['cursor_1'] + move ) % len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])])
+            if jump:
+                if game['cursor_spot'] == 0:
+                    if jump == 'down':
+                        game['cursor_0'] = 11
+                    elif jump == 'up':
+                        game['cursor_0'] = 0
+                if game['cursor_spot'] == 1:
+                    itms = len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]) 
+                    p_size = 12
+                    if jump == 'down':
+                        if itms > p_size:
+                            if game['cursor_1'] == itms-1:
+                                game['cursor_1'] = p_size-1
+                            else:
+                                if game['cursor_1'] + p_size > itms-1:
+                                    game['cursor_1'] = itms-1
+                                else:                        
+                                    game['cursor_1'] = (game['cursor_1'] + p_size) % itms
+                        else:
+                            game['cursor_1'] = itms-1
+                    if jump == 'up':
+                        if itms > p_size:
+                            if game['cursor_1'] < p_size:
+                                if game['cursor_1'] == 0:
+                                    game['cursor_1'] = p_size - game['cursor_1']
+                                else:
+                                    game['cursor_1'] = 0
+                            else:
+                                game['cursor_1'] -= p_size
+                        else:
+                            game['cursor_1'] = 0
+
+
+                    
+                    
             if select:
                 if game['cursor_spot'] == 0:
                     if len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]) > 0:
@@ -139,7 +175,8 @@ def main():
             move = action.get('move')
             select = action.get('select')
             exit = action.get('exit')
-            
+            jump = action.get('jump')
+
             if move and len(items) > 0:
                 game['cursor'] = ( game['cursor'] + move ) % len(items)
             if exit:
@@ -149,6 +186,34 @@ def main():
                 Selected = items[game['cursor']]
                 game['player'].inventory.get_item(Selected)
                 remove_item_from_map(Selected, game)
+                print(game['cursor'], len(items))
+                if game['cursor']+1 >= len(items):
+                    game['cursor'] -= 1
+            if jump:
+                itms = len(items) 
+                p_size = 13
+                if jump == 'down':
+                    if itms > p_size:
+                        if game['cursor'] == itms-1:
+                            game['cursor'] = p_size-1
+                        else:
+                            if game['cursor'] + p_size > itms-1:
+                                game['cursor'] = itms-1
+                            else:                        
+                                game['cursor'] = (game['cursor'] + p_size) % itms
+                    else:
+                        game['cursor'] = itms-1
+                if jump == 'up':
+                    if itms > p_size:
+                        if game['cursor'] < p_size:
+                            if game['cursor'] == 0:
+                                game['cursor'] = p_size - game['cursor']
+                            else:
+                                game['cursor'] = 0
+                        else:
+                            game['cursor'] -= p_size
+                    else:
+                        game['cursor'] = 0
 
         elif game['game_state'] == GameStates.MAIN_MENU:
             # RENDER MENU

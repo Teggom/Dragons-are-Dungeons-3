@@ -3,6 +3,8 @@ from unit_components.ai import Wander, BasicMerchant, BasicMonster
 import math
 import tcod as libtcod
 
+from unit_components.resistances import resistance_comp
+
 
 class Entity:
     """
@@ -18,8 +20,9 @@ class Entity:
         self.race = race
         self.blocks = blocks
         self.stats = stats(race)
-        self.ai = ai
         self.stats.owner = self 
+        self.stats.resistances.owner = self
+        self.ai = ai
         self.dead = False
         self.traits = traits
         self.conditions = []
@@ -34,6 +37,10 @@ class Entity:
         
         if self.inventory:
             self.inventory.owner = self
+
+        
+        self.stats.curr_hp = self.stats.max_hp
+        self.stats.curr_mp = self.stats.max_mp
 
     def give_condition(self, condition):
         self.conditions.append(condition)
@@ -115,6 +122,22 @@ class Entity:
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)    
     
+    # Where damage is a list of damage items
+    def take_damage(self, damage):
+        damage_to_take = {}
+        for dmg in damage:
+            if dmg.type in damage_to_take:
+                damage_to_take[dmg.type] += dmg.get_damage()[0]
+            else:
+                damage_to_take[dmg.type] = dmg.get_damage()[0]
+        taking = 0
+        for d_type in damage_to_take.keys():
+            taking += math.ceiling(
+                damage_to_take[d_type] * self.stats.resistances.get_resistance(d_type)
+            )
+        self.stats.curr_hp = max(0, self.stats.curr_hp - taking)
+
+        
 def get_blocking_entities_at_location(entities, destination_x, destination_y):
     for entity in entities:
         if entity.blocks and entity.x == destination_x and entity.y == destination_y:

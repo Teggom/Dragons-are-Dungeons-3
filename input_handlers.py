@@ -38,6 +38,11 @@ def handle_ground_menu_keys(key):
         return({'exit' : True})
     if key.text == 'g':
         return({'exit' : True})
+    if key.vk == libtcod.KEY_PAGEDOWN:
+        return({'jump' : "down"})
+    if key.vk == libtcod.KEY_PAGEUP:
+        return({'jump' : "up"})
+
     return({})
 
 def handle_equipment_menu_keys(key):
@@ -57,6 +62,10 @@ def handle_equipment_menu_keys(key):
         return({'exit' : True})
     if key.text == 'd':
         return({'drop' : True})
+    if key.vk == libtcod.KEY_PAGEDOWN:
+        return({'jump' : "down"})
+    if key.vk == libtcod.KEY_PAGEUP:
+        return({'jump' : "up"})
     return({})
 
 def handle_playerturn_keys(key):

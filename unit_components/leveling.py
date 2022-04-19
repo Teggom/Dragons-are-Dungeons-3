@@ -6,6 +6,12 @@ class level_tracker():
         self.exp_mod_skill = exp_mod_skill
         self.exp_base_skill = exp_base_skill
 
+        self.hp_exp = 30
+        self.hp_base = 1.4
+
+        self.mp_exp = 20
+        self.mp_base = 1.3
+
         self.levels = {}
 
         to_create_stat = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma']
@@ -46,6 +52,38 @@ class level_tracker():
                     "exp" : 0,
                     "exp_cap" : self.exp_base_skill 
                 }
+        
+        if 'base_hp' in kwargs:
+            self.levels['base_hp'] = {
+                'level' : kwargs['base_hp'],
+                'type' : 'base_hp',
+                'exp' : 0,
+                'exp_cap' : self.hp_base + int(kwargs['base_hp']**self.hp_exp)
+            }
+        else:
+            self.levels['base_hp'] = {
+                'level' : 30,
+                'type' : 'base_hp',
+                'exp' : 0,
+                'exp_cap' : self.hp_base + int(30**self.hp_exp)
+            }
+        
+        if 'mp' in kwargs:
+            self.levels['base_mp'] = {
+                'level' : kwargs['base_mp'],
+                'type' : 'base_mp',
+                'exp' : 0,
+                'exp_cap' : self.mp_base + int(kwargs['base_mp']**self.mp_exp)
+            }
+        else:
+            self.levels['base_mp'] = {
+                'level' : 30,
+                'type' : 'base_mp',
+                'exp' : 0,
+                'exp_cap' : self.mp_base + int(30**self.mp_exp)
+            }
+
+        
 
     def add_exp(self, stat_or_skill, exp):
         self.levels[stat_or_skill]['exp'] += exp
@@ -55,5 +93,9 @@ class level_tracker():
             self.levels[stat_or_skill]['exp'] = self.levels[stat_or_skill]['exp'] % self.levels[stat_or_skill]['exp_cap']
             if self.levels[stat_or_skill]['type'] == 'stat':
                 self.levels[stat_or_skill]['exp_cap'] = self.exp_base_stat + int(self.levels[stat_or_skill]['level']**self.exp_mod_stat)
-            else:
+            elif self.levels[stat_or_skill]['type'] == 'skill':
                 self.levels[stat_or_skill]['exp_cap'] = self.exp_base_skill + int(self.levels[stat_or_skill]['level']**self.exp_mod_skill)
+            elif self.levels[stat_or_skill]['type'] == 'base_hp':
+                self.levels[stat_or_skill]['exp_cap'] = self.hp_base + int(self.levels[stat_or_skill]['level']**self.hp_exp)
+            elif self.levels[stat_or_skill]['type'] == 'base_mp':
+                self.levels[stat_or_skill]['exp_cap'] = self.mp_base + int(self.levels[stat_or_skill]['level']**self.mp_exp)

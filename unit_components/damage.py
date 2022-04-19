@@ -1,10 +1,11 @@
 from random import sample
 class Damage:
-    def __init__(self, string):
+    def __init__(self, string, type = "pure"):
         self.flat = 0
         self.upper = 0
         self.dice_rolls = 0
         self.name = string
+        self.type = type
         self.populate()
     
     def print(self):
@@ -32,4 +33,4 @@ class Damage:
         damage = self.flat
         if self.dice_rolls > 0 and self.upper > 0:
             damage += sum(sample(range(self.upper), self.dice_rolls)) + self.dice_rolls
-        return(damage)
+        return((damage, self.type))

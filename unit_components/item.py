@@ -3,8 +3,9 @@
 # an axe doing 2d6+3 would be
 #   {"dice_rolls" : 2, "upper" : 6, "flat" : 3}
 #   sum(random.sample(range(upper), dice_rolls))+dice_rolls+flat
+# Resistance is applied to items and traits as "X_resistance"
 class Item:
-    def __init__(self, name, type, char, color, x=None, y=None, traits = {}, stats = {}, damages = [], twohand = False, quantity = 1):
+    def __init__(self, name, type, char, color, x=None, y=None, traits = {}, stats = {}, resistances = {}, damages = [], twohand = False, quantity = 1):
         self.name = name
         self.type = type
         self.char = char
@@ -13,6 +14,7 @@ class Item:
         self.y = y
         self.traits = traits
         self.stats = stats
+        self.resistances = resistances
         self.damages = damages
         self.twohand = twohand
         self.quantity = quantity
@@ -25,7 +27,10 @@ class Item:
             return(self.name + " x" + str(self.quantity))
 
     def copy_self(self, quantity = 1):
-        n_item = Item(self.name, self.type, self.char, self.color, self.x, self.y, self.traits, self.stats, self.damages, self.twohand, quantity=quantity)
+        n_item = Item(name = self.name, type=self.type, char = self.char,
+            color=self.color, x=self.x, y=self.y, traits=self.traits, 
+            stats = self.stats, resistances = self.resistances, damages=self.damages,
+            twohand = self.twohand, quantity=quantity)
         n_item.owner = self.owner
         return(n_item)
     
