@@ -66,7 +66,7 @@ def load_gamestart(game, race, clss):
     game['game_map'] = GameMap(game['map_width'], game['map_height'])
     game['game_map'].make_map(game['max_rooms'], game['room_min_size'], game['room_max_size'], game['map_width'], game['map_height'], game['player'], game['entities'], 1, 1, game)
     game['fov_map'] = initialize_fov(game['game_map'])
-    game['slot_names'] = ['Head', "Neck", "Chest", "Back", "Left Arm", "Right Arm", "Left Hand", "Right Hand", "Belt", "Legs", "Left Foot", "Right Foot"]
+    game['slot_names'] = ['Head', "Neck", "Chest", "Back", "Left Arm", "Right Arm", "Left Hand", "Right Hand", "Left Ring", "Right Ring", "Belt", "Legs", "Left Foot", "Right Foot"]
 
     for i in range(10):
         new_item = make_item(sample([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 1)[0])
@@ -86,6 +86,8 @@ def load_equipment_menu(game):
     game['cursor_0'] = 0
     game['cursor_1'] = 0
     game['cursor_spot'] = 0
+    game['cursor_tab'] = 0
+    game['cursor_tab_options'] = 3
     game['option'] = 1
 
 def load_inventory_menu(game):

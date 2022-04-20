@@ -15,3 +15,5 @@ def gear_lookup(slot_name):
         return "Weapon"
     if slot_name == "Left Foot" or slot_name == "Right Foot":
         return "Feet"
+    if slot_name == 'Left Ring' or slot_name == "Right Ring":
+        return 'Rings'

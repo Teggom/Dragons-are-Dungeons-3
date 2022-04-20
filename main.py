@@ -18,7 +18,7 @@ from unit_components.stat_mod import trait
 from pprint import pprint
 from time import sleep
 from bundled.loaders import load_charselect, load_equipment_menu, load_gamestart, load_ground_menu, load_inventory_menu, load_preamble, load_mainmenu
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 game = {}
 
 def main():
@@ -86,21 +86,24 @@ def main():
             back = action.get('back')
             drop = action.get('drop')
             jump = action.get('jump')
+            tab = action.get('tab')
 
             if move:
                 if game['cursor_spot'] == 0:
-                    game['cursor_0'] = ( game['cursor_0'] + move ) % 12
+                    game['cursor_0'] = ( game['cursor_0'] + move ) % len(game['slot_names'])
                 elif game['cursor_spot'] == 1:
                     game['cursor_1'] = ( game['cursor_1'] + move ) % len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])])
+            if tab:
+                game['cursor_tab'] = ( game['cursor_tab'] + 1 ) % game['cursor_tab_options']
             if jump:
                 if game['cursor_spot'] == 0:
                     if jump == 'down':
-                        game['cursor_0'] = 11
+                        game['cursor_0'] = len(game['slot_names'])-1
                     elif jump == 'up':
                         game['cursor_0'] = 0
                 if game['cursor_spot'] == 1:
                     itms = len(game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]) 
-                    p_size = 12
+                    p_size = len(game['slot_names'])
                     if jump == 'down':
                         if itms > p_size:
                             if game['cursor_1'] == itms-1:
@@ -178,6 +181,7 @@ def main():
             jump = action.get('jump')
 
             if move and len(items) > 0:
+                print(game['player'].stats.resistances.owner.name)
                 game['cursor'] = ( game['cursor'] + move ) % len(items)
             if exit:
                 game['game_state'] = GameStates.PLAYER_TURN

@@ -3,9 +3,15 @@ from unit_components.resistances import resistance_comp
 
 
 class stats():
-    def __init__(self, unit_type="Human", level_comp = level_tracker(), resistances = resistance_comp()):
+    def __init__(self, unit_type="Human", level_comp = None, resistances = None):
         # Rather than set these below, set them here.
         #  helps keep track of what I have and have not defined
+
+        
+        if resistances == None:
+            resistances = resistance_comp()
+        if level_comp == None:
+            level_comp = level_tracker()
         stat_package = self.get_stat_package(unit_type)
         self.resistances = resistances
 

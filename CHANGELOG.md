@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.12] - 2022-04-20
+
+### Added
+- Resistances window in equipment menu
+- Two new slots for Rings
+  - Left Ring
+  - Right Ring
+
+### Changed
+- Tab now cycles through equipment menu windows
+  - Stats, Skills, Resistances
+- Item window shows Item's stats and information dynamically
+  - No longer a fixed size, shows no irrelevant stats
+- Item window now displays damage values and averages
+
+### Fixed
+- Duel-handing weapons with equipment now display correct stats
+  - Having a "two handed" axe in your right hand
+    - Equiping a 'two handed' axe in your left hand shows correct difference
+    - Equiping a 'one handed' weapon in either hand shows correct difference
+  - When trying to equip a two handed weapon
+    - Correct stats show for any permutation of equipment
+
 ## [0.0.11] - 2022-04-19
 
 ### Added

@@ -30,11 +30,16 @@ class resistance_comp():
 
 
     # pass the stat as a single string
-    def get_resistance(self, res, percent = True):
-        total = self.resistances["base_" + res + "_resistance"]
-        total += self.res_check_equipment(res + "_resistance")
-        total += self.res_check_trait(res + "_resistance")
-        total += self.res_check_condition(res + "_resistance")
+    def get_resistance(self, res, percent = True, get = ['base', 'equip', 'traits', 'conditions']):
+        total = 0
+        if 'base' in get:
+            total += self.resistances["base_" + res + "_resistance"]
+        if 'equip' in get:
+            total += self.res_check_equipment(res + "_resistance")
+        if 'trait' in get:
+            total += self.res_check_trait(res + "_resistance")
+        if 'conditions' in get:
+            total += self.res_check_condition(res + "_resistance")
         if percent:
             if total < 0:
                 extra = abs(total)/(self.stat_denom+abs(total))
@@ -50,7 +55,7 @@ class resistance_comp():
     # Equipment has X_resistance
     def res_check_equipment(self, resistance):
         total = 0
-        if self.owner.inenvory:
+        if self.owner.inventory:
             for gear_slot in self.owner.inventory.wearing.keys():
                 if self.owner.inventory.wearing[gear_slot]:
                     if self.owner.inventory.wearing[gear_slot].resistances.get(resistance):

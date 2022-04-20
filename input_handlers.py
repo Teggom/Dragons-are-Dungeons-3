@@ -66,6 +66,8 @@ def handle_equipment_menu_keys(key):
         return({'jump' : "down"})
     if key.vk == libtcod.KEY_PAGEUP:
         return({'jump' : "up"})
+    if key.vk == libtcod.KEY_TAB:
+        return({'tab' : True})
     return({})
 
 def handle_playerturn_keys(key):
