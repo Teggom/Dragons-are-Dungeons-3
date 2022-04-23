@@ -15,6 +15,20 @@ def render_base_screen(game):
 
     menu_strip(game['con'], game)
 
+def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color, game):
+    bar_width = int(float(value) / maximum * total_width)
+
+    libtcod.console_set_default_background(panel, back_color)
+    libtcod.console_rect(panel, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
+
+    libtcod.console_set_default_background(panel, bar_color)
+    if bar_width > 0:
+        libtcod.console_rect(panel, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
+
+    libtcod.console_set_default_foreground(panel, libtcod.white)
+    libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE, libtcod.CENTER,
+                             '{0}: {1}/{2}'.format(name, value, maximum))
+
 def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, camera_width, camera_height, game):
     move_camera(game['player'].x, game['player'].y, game)
     if fov_recompute:
@@ -55,7 +69,28 @@ def render_all(con, player, entities, game_map, fov_map, fov_recompute, screen_w
     for entity in entities:
         draw_entity(con, entity, fov_map, game)
 
+    # Test
+    #libtcod.console_put_char(con, game['player'].x+1, game['player'].y, 180, libtcod.BKGND_NONE)
+    # Print the game messages, one line at a time
+   
+
     libtcod.console_blit(con, 0, 0, camera_width, camera_height, 20, 0,  0)
+
+    libtcod.console_set_default_background(game['panel'], libtcod.black)
+    libtcod.console_clear(game['panel'])
+
+    y = 1
+    for message in game['message_log'].messages:
+        libtcod.console_set_default_foreground(game['panel'], message.color)
+        libtcod.console_print_ex(game['panel'], game['message_log'].x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
+        y += 1
+
+    render_bar(game['panel'], 1, 1, game['bar_width'], 'HP', game['player'].stats.hp, game['player'].stats.max_hp,
+               libtcod.lighter_red, libtcod.darker_red, game)
+    render_bar(game['panel'], 1, 3, game['bar_width'], 'MP', game['player'].stats.mp, game['player'].stats.max_mp,
+               libtcod.lighter_blue, libtcod.darker_blue, game)
+
+    libtcod.console_blit(game['panel'], 0, 0, screen_width, game['panel_height'], 0, 0, game['panel_y'])
     #libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
 def move_camera(target_x, target_y, game):

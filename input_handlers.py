@@ -58,7 +58,7 @@ def handle_equipment_menu_keys(key):
         return({"back" : True})
     if key.vk == libtcod.KEY_ESCAPE:
         return({'exit' : True})
-    if key.text == 'e':
+    if key.text == 'u':
         return({'exit' : True})
     if key.text == 'd':
         return({'drop' : True})
@@ -72,17 +72,27 @@ def handle_equipment_menu_keys(key):
 
 def handle_playerturn_keys(key):
     # Movement keys
-    if key.vk == libtcod.KEY_UP:
+    if key.vk == libtcod.KEY_UP or key.text == 'w':
         return {'move': (0, -1)}
-    elif key.vk == libtcod.KEY_DOWN:
+    elif key.vk == libtcod.KEY_DOWN or key.text == 'x':
         return {'move': (0, 1)}
-    elif key.vk == libtcod.KEY_LEFT:
+    elif key.vk == libtcod.KEY_LEFT or key.text == 'a':
         return {'move': (-1, 0)}
-    elif key.vk == libtcod.KEY_RIGHT:
+    elif key.vk == libtcod.KEY_RIGHT or key.text == 'd':
         return {'move': (1, 0)}
+    elif key.text == 'q':
+        return {'move': (-1, -1)}
+    elif key.text == 'e':
+        return {'move': (1, -1)}
+    elif key.text == 'z':
+        return {'move': (-1, 1)}
+    elif key.text == 'c':
+        return {'move': (1, 1)}
+    elif key.text == 's':
+        return {'wait': True}
     elif key.text == 'g':
         return {'ground_menu_opened' : True}
-    elif key.text == 'e':
+    elif key.text == 'u':
         return {'equipment_menu_opened' : True}
     elif key.text == 'i':
         return {'inventory_menu_opened' : True}

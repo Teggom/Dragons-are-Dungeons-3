@@ -5,11 +5,12 @@
 #   sum(random.sample(range(upper), dice_rolls))+dice_rolls+flat
 # Resistance is applied to items and traits as "X_resistance"
 class Item:
-    def __init__(self, name, type, char, color, x=None, y=None, traits = {}, stats = {}, resistances = {}, damages = [], twohand = False, quantity = 1):
+    def __init__(self, name, type, vis_package, x=None, y=None, traits = {}, stats = {}, resistances = {}, damages = [], twohand = False, quantity = 1):
         self.name = name
         self.type = type
-        self.char = char
-        self.color = color
+        self.vis_package = vis_package
+        self.char = self.vis_package['CHAR']
+        self.color = self.vis_package['COLOR']
         self.x = x
         self.y = y
         self.traits = traits
@@ -27,8 +28,7 @@ class Item:
             return(self.name + " x" + str(self.quantity))
 
     def copy_self(self, quantity = 1):
-        n_item = Item(name = self.name, type=self.type, char = self.char,
-            color=self.color, x=self.x, y=self.y, traits=self.traits, 
+        n_item = Item(name = self.name, type=self.type, vis_package=self.vis_package, x=self.x, y=self.y, traits=self.traits, 
             stats = self.stats, resistances = self.resistances, damages=self.damages,
             twohand = self.twohand, quantity=quantity)
         n_item.owner = self.owner

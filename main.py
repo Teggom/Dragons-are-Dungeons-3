@@ -1,5 +1,6 @@
 import libtcodpy as libtcod
 from time import sleep
+from bundled.game_messages import Message
 from bundled.item_loader import place_item, remove_item_from_map
 from entity import Entity, get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
@@ -65,6 +66,10 @@ def main():
                 if game['cursor_spot'] == 0:
                     game['cursor_spot'] = 1
                 else:
+                    game['message_log'].add_message(Message("You begin your journey as a {} {}".format(
+                        list(game['options'].keys())[game['cursor_0']],
+                        game['options'][list(game['options'].keys())[game['cursor_0']]][game['cursor_1']]
+                    )))
                     load_gamestart(
                         game, 
                         race=list(game['options'].keys())[game['cursor_0']],
@@ -137,6 +142,7 @@ def main():
                 elif game['cursor_spot'] == 1:
                     selected_item = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']]
                     game['player'].inventory.equip_item(selected_item, position = game['slot_names'][game['cursor_0']])
+                    game['message_log'].add_message(Message("You equip {}".format(selected_item.name)))
                     game['cursor_spot'] = 0
                     game['cursor_1'] = 0
             if back:
@@ -149,7 +155,8 @@ def main():
             if drop:
                 if game['cursor_spot'] == 0:
                     # unequip to bag
-                    game['player'].inventory.unequip_item(game['slot_names'][game['cursor_0']])
+                    if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
+                        game['player'].inventory.unequip_item(game['slot_names'][game['cursor_0']])
                 elif game['cursor_spot'] == 1:
                     # drop
                     selected_item = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])][game['cursor_1']].copy_self()
@@ -181,7 +188,6 @@ def main():
             jump = action.get('jump')
 
             if move and len(items) > 0:
-                print(game['player'].stats.resistances.owner.name)
                 game['cursor'] = ( game['cursor'] + move ) % len(items)
             if exit:
                 game['game_state'] = GameStates.PLAYER_TURN
@@ -190,7 +196,6 @@ def main():
                 Selected = items[game['cursor']]
                 game['player'].inventory.get_item(Selected)
                 remove_item_from_map(Selected, game)
-                print(game['cursor'], len(items))
                 if game['cursor']+1 >= len(items):
                     game['cursor'] -= 1
             if jump:
@@ -272,9 +277,11 @@ def main():
                     
                     game['fov_recompute'] = True
                     if target:
-                        print('You kick the ' + target.name + ' in the shins, much to its annoyance!')
+                        game['message_log'].add_message(Message('You kick the ' + target.name + ' in the shins, much to its annoyance!'))
                     else:
                         game['player'].move(dx, dy)
+                else:
+                    game['message_log'].add_message(Message('You kick the wall'))
                 game['player'].step()
                 game['game_state'] = GameStates.ENEMY_TURN
 

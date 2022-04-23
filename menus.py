@@ -1,20 +1,46 @@
 import enum
 import math
+import time
 import tcod as libtcod
 from textwrap import wrap
 from helper_funcs import gear_lookup
 
 def menu_strip(con, game):
     window = libtcod.console_new(game['screen_width'], 1)
-    for i, v in enumerate(['    Ground [g]    ', '  Equipment [e]   ', '  Inventory [i]   ', '     Map [m]      ']):
+    elements = [
+        [["G", 'round'], 0],
+        [['Eq', 'u', 'ipment'], 1],
+        [['B', 'ags'], 0],
+        [['L', 'ook'], 0],
+        [['I', 'nteract'], 0],
+        [['P', 'erform'], 0]
+    ]
+    #for i, v in enumerate(['    Ground [g]    ', '  Equipment [e]   ', '  Inventory [i]   ', '     Map [m]      ']):
+    for i, v in enumerate(elements):
+        text = ""
+        for elem in v[0]:
+            text += elem
         if game['option'] == i:
             libtcod.console_set_default_foreground(window, libtcod.white)
             libtcod.console_set_default_background(window, libtcod.gray)
-            libtcod.console_print_ex(window, i*18, 0, libtcod.BKGND_ADD, libtcod.LEFT, v)
+            libtcod.console_print_ex(window, i*18-5, 0, libtcod.BKGND_ADD, libtcod.LEFT, "                  ")
+            libtcod.console_print_ex(window, i*18, 0, libtcod.BKGND_NONE, libtcod.LEFT, text)
         else:
             libtcod.console_set_default_foreground(window, libtcod.gray)
             libtcod.console_set_default_background(window, libtcod.black)
-            libtcod.console_print_ex(window, i*18, 0, libtcod.BKGND_DEFAULT, libtcod.LEFT, v)
+            dist = 0
+            for j, k in enumerate(v[0]):
+                #print(j, k, dist, v[0], v[1])
+                if j == v[1]:
+                    libtcod.console_set_default_foreground(window, libtcod.darker_yellow)
+                    libtcod.console_set_default_background(window, libtcod.black)
+                    libtcod.console_print_ex(window, i*18+dist, 0, libtcod.BKGND_DEFAULT, libtcod.LEFT, k)
+                else:
+                    libtcod.console_set_default_foreground(window, libtcod.gray)
+                    libtcod.console_set_default_background(window, libtcod.black)
+                    libtcod.console_print_ex(window, i*18+dist, 0, libtcod.BKGND_DEFAULT, libtcod.LEFT, k)
+                dist += len(k)
+            #libtcod.console_print_ex(window, i*18, 0, libtcod.BKGND_DEFAULT, libtcod.LEFT, v)
     
     libtcod.console_blit(window, 0, 0, game['screen_width'], 1, 0, 0, 0, 1.0, 0.7)
 
@@ -106,13 +132,14 @@ def equipment_menu(con, game):
     # puts it to the right of the main window
     libtcod.console_blit(bag_window, -slot_width-2, -2, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
 
+    
 
     draw_character_stat_menu(chara_height=43, chara_width=80, pos_x= -1, pos_y=-5-len(game['slot_names']), game=game)
     
 
-    ret_size, ret_groups = draw_item_stat_menu_2(item_height = 45, item_width = 45, x_pos = -bag_width-slot_width-3, y_pos = -2, game=game, draw = False)
+    ret_size, ret_groups = draw_item_stat_menu_2(item_height = 45, item_width = 42, x_pos = -bag_width-slot_width-3, y_pos = -2, game=game, draw = False)
     if ret_size > 3:
-        draw_item_stat_menu_2(item_height = ret_size-2+len(ret_groups), item_width = 45, x_pos = -bag_width-slot_width-3, y_pos = -2, game=game, draw=True, to_draw = ret_groups)
+        draw_item_stat_menu_2(item_height = ret_size-2+len(ret_groups), item_width = 42, x_pos = -bag_width-slot_width-3, y_pos = -2, game=game, draw=True, to_draw = ret_groups)
     pass
 
 def draw_item_stat_menu_2(item_height, item_width, x_pos, y_pos, game, draw = True, to_draw = ['stats', 'skills', 'resistances']):
@@ -120,8 +147,8 @@ def draw_item_stat_menu_2(item_height, item_width, x_pos, y_pos, game, draw = Tr
     libtcod.console_print_frame(item_window, 0, 0, item_width, item_height, True, fmt="Item")
     text_indent = 15
     old_value_indent = 21
-    arrow_indent = 27
-    new_value_indent = 33
+    arrow_indent = 26
+    new_value_indent = 31
     
     s_drop = 3
     stat_drop = s_drop+4
@@ -579,1226 +606,6 @@ def draw_item_stat_menu_2(item_height, item_width, x_pos, y_pos, game, draw = Tr
             drawing.append('resistances')
         return((draw_line_drop, drawing))
 
-def draw_item_stat_menu(item_height, item_width, x_pos, y_pos, game):
-    item_window = libtcod.console_new(item_width, item_height)
-    
-    libtcod.console_print_frame(item_window, 0, 0, item_width, item_height, True, fmt="Item")
-    text_indent = 15
-    old_value_indent = 17
-    arrow_indent = 21
-    new_value_indent = 25
-    s_drop = 3
-    stat_drop = s_drop+4
-    skill_drop = stat_drop+10
-    resistance_drop = skill_drop + 12
-
-    using_bag = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]
-    
-    libtcod.console_set_default_foreground(item_window, libtcod.black)
-    libtcod.console_set_default_background(item_window, libtcod.lighter_gray)
-    
-    for i in range(item_height-3):
-        if i % 2 == 0:
-            libtcod.console_set_default_background(item_window, libtcod.black)
-        else:
-            libtcod.console_set_default_background(item_window, libtcod.darkest_gray) 
-        libtcod.console_print_ex(item_window, 1, i+2, libtcod.BKGND_ADD, libtcod.LEFT, ' '*(item_width-2))
-
-    libtcod.console_set_default_foreground(item_window, libtcod.lighter_gray)
-    libtcod.console_set_default_background(item_window, libtcod.black)
-
-    if game['cursor_spot'] == 0:
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-        else:
-            item = None
-    else:
-        item = using_bag[game['cursor_1']]
-    
-    if item:
-        name = wrap(item.name, item_width-2)
-        libtcod.console_print_ex(item_window, int(item_width/2), 1, libtcod.BKGND_NONE, libtcod.CENTER, name[0])
-        if len(name) == 2:
-            libtcod.console_print_ex(item_window, int(item_width/2), 2, libtcod.BKGND_NONE, libtcod.CENTER, name[1])
-        
-        libtcod.console_print_ex(item_window, text_indent, s_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Rarity:")
-        libtcod.console_print_ex(item_window, new_value_indent, s_drop, libtcod.BKGND_NONE, libtcod.LEFT, "TODO")
-        
-        libtcod.console_print_ex(item_window, text_indent, s_drop+1, libtcod.BKGND_NONE, libtcod.RIGHT, "Value:")
-        libtcod.console_print_ex(item_window, new_value_indent, s_drop+1, libtcod.BKGND_NONE, libtcod.LEFT, "TODO")
-        
-        libtcod.console_print_ex(item_window, text_indent, s_drop+2, libtcod.BKGND_NONE, libtcod.RIGHT, "Type:")
-        libtcod.console_print_ex(item_window, new_value_indent, s_drop+2, libtcod.BKGND_NONE, libtcod.LEFT, item.type)
-        
-        libtcod.console_set_default_foreground(item_window, libtcod.lighter_yellow)
-
-
-
-        base_color = libtcod.lighter_gray
-        decrease_color = libtcod.red
-        same_color = libtcod.darker_gray
-        increase_color = libtcod.green
-
-        header_fore = libtcod.black
-        header_back = libtcod.gray
-        # MAKE
-        # in green
-        # Strength: 20 -> 23   (+3)
-        # in red
-        #   Wisdom: 20 -> 0    (-20)
-        # in gray
-        # Charisma: 13 -> 13   (0)
-        
-
-        libtcod.console_set_default_foreground(item_window, header_fore)
-        libtcod.console_set_default_background(item_window, header_back)
-        libtcod.console_print_ex(item_window, arrow_indent, stat_drop-1, libtcod.BKGND_SET, libtcod.CENTER, "STATS")
-
-        cur_stat = "strength"
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Strength:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Strength:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        
-        cur_stat = "dexterity"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Dexterity:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Dexterity:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "intelligence"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Intelligence:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Intelligence:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "wisdom"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Wisdom:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Wisdom:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "charisma"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Charisma:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Charisma:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "luck"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Luck:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Luck:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "memory"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Memory:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Memory:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "sight"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Sight:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Sight:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_stat = "perception"
-        stat_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_stat):
-            new_stat += item.stats.get(cur_stat)
-        if item.traits.get(cur_stat):
-            new_stat += item.traits.get(cur_stat)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_stat):
-                old_stat += old_item.stats.get(cur_stat)
-            if old_item.traits.get(cur_stat):
-                old_stat += old_item.traits.get(cur_stat)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Perception:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Perception:")
-            libtcod.console_print_ex(item_window, arrow_indent, stat_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, stat_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        libtcod.console_set_default_foreground(item_window, header_fore)
-        libtcod.console_set_default_background(item_window, header_back)
-        libtcod.console_print_ex(item_window, arrow_indent, skill_drop-1, libtcod.BKGND_SET, libtcod.CENTER, "SKILLS")
-
-
-        cur_skill = "athletics"
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Athletics:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Athletics:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "acrobatics"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Acrobatics:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Acrobatics:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "slight_of_hand"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Slight of Hand:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Slight of Hand:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "stealth"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Stealth:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Stealth:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "arcana"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Arcana:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Arcana:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "alchemy"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Alchemy:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Alchemy:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "crafting"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Crafting:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Crafting:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "bartering"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Bartering:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Bartering:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "persuasion"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Persuasion:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Persuasion:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "intimidation"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Intimidation:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Intimidation:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        cur_skill = "deception"
-        skill_drop += 1
-        new_stat = 0
-        if item.stats.get(cur_skill):
-            new_stat += item.stats.get(cur_skill)
-        if item.traits.get(cur_skill):
-            new_stat += item.traits.get(cur_skill)
-        old_stat = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.stats.get(cur_skill):
-                old_stat += old_item.stats.get(cur_skill)
-            if old_item.traits.get(cur_skill):
-                old_stat += old_item.traits.get(cur_skill)
-        
-        if game['cursor_spot'] == 0:
-            if new_stat == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Deception:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_stat == old_stat:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Deception:")
-            libtcod.console_print_ex(item_window, arrow_indent, skill_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_stat))
-            if old_stat > new_stat:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_stat < new_stat:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, skill_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_stat))
-        
-        libtcod.console_set_default_foreground(item_window, header_fore)
-        libtcod.console_set_default_background(item_window, header_back)
-        libtcod.console_print_ex(item_window, arrow_indent, resistance_drop-1, libtcod.BKGND_SET, libtcod.CENTER, "RESISTANCES")
-
-        
-        cur_res = "slash"
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Slash Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Slash Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-
-        cur_res = "pierce"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Pierce Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Pierce Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-        
-        cur_res = "blunt"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Blunt Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Blunt Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-
-        cur_res = "fire"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Fire Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Fire Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        cur_res = "frost"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Frost Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Frost Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-        cur_res = "shock"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Shock Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Shock Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-        cur_res = "arcane"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Arcane Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Arcane Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-        cur_res = "poison"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Poison Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Poison Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-        cur_res = "holy"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Holy Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Holy Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-        cur_res = "unholy"
-        resistance_drop += 1
-        new_res = 0
-        if item.resistances.get(cur_res + "_resistance"):
-            new_res += item.resistances.get(cur_res + "_resistance")
-        if item.traits.get(cur_res + "_resistance"):
-            new_res += item.traits.get(cur_res + "_resistance")
-        old_res = 0
-        if game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]:
-            old_item = game['player'].inventory.wearing[game['slot_names'][game['cursor_0']]]
-            if old_item.resistances.get(cur_res + "_resistance"):
-                old_res += old_item.resistances.get(cur_res + "_resistance")
-            if old_item.traits.get(cur_res + "_resistance"):
-                old_res += old_item.traits.get(cur_res + "_resistance")
-        if game['cursor_spot'] == 0:
-            if new_res == 0:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, base_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Unholy Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-
-        else:
-            libtcod.console_set_default_foreground(item_window, base_color)
-            if new_res == old_res:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, text_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "Unholy Resist:")
-            libtcod.console_print_ex(item_window, arrow_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.RIGHT, "->")
-            libtcod.console_print_ex(item_window, old_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(old_res))
-            if old_res > new_res:
-                libtcod.console_set_default_foreground(item_window, decrease_color)
-            elif old_res < new_res:
-                libtcod.console_set_default_foreground(item_window, increase_color)
-            else:
-                libtcod.console_set_default_foreground(item_window, same_color)
-            libtcod.console_print_ex(item_window, new_value_indent, resistance_drop, libtcod.BKGND_NONE, libtcod.LEFT, str(new_res))
-        
-
-    libtcod.console_blit(item_window, x_pos, y_pos, game['screen_width'], game['screen_height'], 0, 0, 0, 1.0, 0.7)
-
-    pass
 
 def ground_menu(con, game, items):
     height = 15 #len(items) + 5
@@ -1922,6 +729,84 @@ def main_menu(con, background_image, game):
     x = 0 # int(game['screen_width'] / 2 - width / 2)-15
     y = 0 # int(game['screen_height'] / 2 - height / 2)
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+    
+    # SAMPLE_WIDTH = 24
+    # SAMPLE_HEIGHT = 5
+    # FONT = "TerminusAliased_handedit_gal.png"
+    # sample_console = libtcod.console.Console(SAMPLE_WIDTH, SAMPLE_HEIGHT, order="F")
+    # tileset = libtcod.tileset.load_tilesheet(FONT, 32, 8, libtcod.tileset.CHARMAP_CP437)
+    # context = libtcod.context.new(
+    #     columns=width,
+    #     rows=height,
+    #     title=f"python-tcod samples" f" (python-tcod {libtcod.__version__}, libtcod)",
+    #     renderer=libtcod.RENDERER_SDL2,
+    #     vsync=False,  # VSync turned off since this is for benchmarking.
+    #     tileset=tileset,
+    # )
+    # if context.sdl_renderer:  # If this context supports SDL rendering.
+    #     # Start by setting the logical size so that window resizing doesn't break anything.
+    #     context.sdl_renderer.logical_size = (
+    #         tileset.tile_width * width,
+    #         tileset.tile_height * height,
+    #     )
+    #     assert context.sdl_atlas
+    #     console_render = libtcod.render.SDLConsoleRender(context.sdl_atlas)
+    #     sample_minimap = context.sdl_renderer.new_texture(
+    #         SAMPLE_WIDTH,
+    #         SAMPLE_HEIGHT,
+    #         format=libtcod.lib.SDL_PIXELFORMAT_RGB24,
+    #         access=libtcod.sdl.render.TextureAccess.STREAMING,  # Updated every frame.
+    #     )
+
+    # if context.sdl_renderer:
+    #     sample_minimap.update(sample_console.rgb.T['bg'])
+    #     context.sdl_renderer.copy(console_render.render(game['con']))
+    #     context.sdl_renderer.copy(
+    #             sample_minimap,
+    #             dest=(
+    #                 tileset.tile_width * 24,
+    #                 tileset.tile_height * 36,
+    #                 SAMPLE_WIDTH * 3,
+    #                 SAMPLE_HEIGHT * 3,
+    #             ),
+    #         )
+    #     context.sdl_renderer.present()
+    # else:  # No SDL renderer, just use plain context rendering.
+    #     context.present(game['con'])
+    # context.close()
+
+
+
+
+
+
+
+
+    t_height = 3
+    t_width = 24
+    #sdl_window = libtcod.sdl.video.new_window(400, 400)
+    #t_window = libtcod.sdl.render.new_renderer(sdl_window, target_textures=True)
+    t_window = libtcod.console_new(t_width, t_height)
+    libtcod.console_set_default_foreground(t_window, libtcod.white)
+    libtcod.console_set_default_background(t_window, libtcod.blue)
+    
+    #libtcod.console_set_custom_font(new_tex, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
+    #new_tile = libtcod.tileset.load_tilesheet(new_tex, 16, 16, libtcod.tileset.CHARMAP_CP437)
+    #libtcod.context.Context.change_tileset(t_window, new_tile)
+
+    #libtcod.console_print_frame(t_window, 0, 0, t_width, t_height, True, fmt="TITLE")
+    # libtcod.console_print_ex(t_window, 2, 1, libtcod.BKGND_NONE, libtcod.LEFT,
+    #                          'Dragons are Dungeons')
+    
+
+    #libtcod.console_blit(t_window, 0, 0, t_width, t_height, 0, 15, 10, 1.0, 0.7)
+    #libtcod.console_set_custom_font("arial10x10.png", libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    
+    
+
+
+    #libtcod.render.SDLTilesetAtlus()
+
     #libtcod.console_blit()
     #menu(con, '', game['options'], 24, game['screen_width'], game['screen_height'], game['cursor'])
 # def menu(con, header, options, width, screen_width, screen_height, cursor):

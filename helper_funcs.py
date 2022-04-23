@@ -17,3 +17,5 @@ def gear_lookup(slot_name):
         return "Feet"
     if slot_name == 'Left Ring' or slot_name == "Right Ring":
         return 'Rings'
+    
+

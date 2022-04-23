@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.13] - 2022-04-21
+
+### Added
+- Visible Health and Mana Bar
+- Message Log
+
+### Changed
+- Ascii pack is different now
+  - Items have a few custom Ascii(s)
+- Items now take a dict for char and color
+  - Eventual goal will be: 
+    - Create Sword X. 
+    - Sword x gets Char '/' and color silver
+    - Can sword X have any applied things? Like of fire? 
+      - If so, apply one randomly
+      - If "of fire" is on a weapon, add a damage type and change color to red. 
+    - Place sword
+- Menu bar is now different
+  - u opens equipment
+  - keys are highlighted in yellow
+    - Looks nice in Qud
+  - new menu options (not implmented)
+- Movement keys have changed
+  - Arrow keys work. However
+    - wdxa are now valid substitutes
+    - qezc allow diagonal movement
+    - s will be a stand in for wait/search
+      - Might swap s and x if it isn't comfortable
+
+### Fixed
+- Removed unused folder unit_stats/ from repo
+
+
 ## [0.0.12] - 2022-04-20
 
 ### Added
