@@ -12,8 +12,8 @@ import tcod as libtcod
 
 def load_preamble(game, VERSION):
     # Size of window
-    game['screen_width'] = 126
-    game['screen_height'] = 67
+    game['screen_width'] = 55
+    game['screen_height'] = 31
 
     # Map size( Can change )
     game['map_width'] = 150#80
@@ -28,7 +28,28 @@ def load_preamble(game, VERSION):
     game['message_height'] = game['panel_height'] - 1
     game['message_log'] = MessageLog(game['message_x'], game['message_width'], game['message_height'])
 
+    game['tileset_text'] = libtcod.tileset.load_tilesheet("./tilesets/arial10x10.png", 32, 8, libtcod.tileset.CHARMAP_TCOD)
+    game['tileset_title'] = libtcod.tileset.load_tilesheet("./tilesets/large48x48.png", 16, 16, libtcod.tileset.CHARMAP_CP437)
+    game['tileset_map'] = libtcod.tileset.load_tilesheet("./tilesets/test32x32.png", 16, 16, libtcod.tileset.CHARMAP_CP437)
+
+    # Cleared after every round
+    game['console_base'] = libtcod.Console(game['screen_width'], game['screen_height'])
+    game['sdl_window'] = libtcod.sdl.video.new_window(
+        game['console_base'].width * game['tileset_map'].tile_width,
+        game['console_base'].height * game['tileset_map'].tile_height,
+        flags=libtcod.lib.SDL_WINDOW_RESIZABLE,
+    )
+    game['sdl_renderer'] = libtcod.sdl.render.new_renderer(game['sdl_window'], target_textures = True)
+
     game['panel'] = libtcod.console_new(game['screen_width'], game['panel_height'])
+    game['atlas_text'] = libtcod.render.SDLTilesetAtlas(game['sdl_renderer'], game['tileset_text'])
+    game['atlas_title'] = libtcod.render.SDLTilesetAtlas(game['sdl_renderer'], game['tileset_title'])
+    game['atlas_map'] = libtcod.render.SDLTilesetAtlas(game['sdl_renderer'], game['tileset_map'])
+
+    game['console_renderer_text'] = libtcod.render.SDLConsoleRender(game['atlas_text'])
+    game['console_renderer_title'] = libtcod.render.SDLConsoleRender(game['atlas_title'])
+    game['console_renderer_map'] = libtcod.render.SDLConsoleRender(game['atlas_map'])
+    
     
     # Camera Size 
     game['camera_width'] = game['screen_width']
@@ -36,11 +57,11 @@ def load_preamble(game, VERSION):
     
     game['fov_algorithm'] = 4
     game['fov_light_walls'] = True
-    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    #libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     #libtcod.console_set_custom_font('Talryth_square_15x15.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
     #libtcod.console_set_custom_font('drd15x15.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
-    libtcod.console_init_root(game['screen_width'], game['screen_height'], 'Dragons are Dungeons 3: {}'.format(VERSION), False)
-    game['con'] = libtcod.console_new(game['screen_width'], game['screen_height'])
+    #libtcod.console_init_root(game['screen_width'], game['screen_height'], 'Dragons are Dungeons 3: {}'.format(VERSION), False)
+    #game['con'] = libtcod.console_new(game['screen_width'], game['screen_height'])
     game['key'] = libtcod.Key()
     game['mouse'] = libtcod.Mouse()
 

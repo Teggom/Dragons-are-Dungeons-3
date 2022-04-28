@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.14] - 2022-04-28
+
+### Changed
+- sdl_rendering is now used for everything. Changes from this are as follows
+  - This allows multiple tilesets to be rendered in the same frame
+  - Multiple tilesets added. Huge credit to Dwarf Fortress wiki for supplying them
+    - Map tileset is now 32x32 (for now)
+    - Text tileset is now 16x10
+    - Title tileset is now 48x48 (for now)
+  - Title is now much larger and RED
+  - Map is now a huge grid of 32x32 tiles
+    - Menus render on top of the map as before, and are of the text tileset
+
+### Fixed
+- Updated cursor UI so selected elements are black on yellow
+
+
 ## [0.0.13] - 2022-04-21
 
 ### Added

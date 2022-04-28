@@ -19,13 +19,13 @@ from unit_components.stat_mod import trait
 from pprint import pprint
 from time import sleep
 from bundled.loaders import load_charselect, load_equipment_menu, load_gamestart, load_ground_menu, load_inventory_menu, load_preamble, load_mainmenu
-VERSION = "0.0.12"
+VERSION = "0.0.14"
 game = {}
 
 def main():
     load_preamble(game, VERSION)
     load_mainmenu(game)
-    # Some variables for the rooms in the map
+    ## Some variables for the rooms in the map
 
 
     #game_state = GameStates.PLAYER_TURN
@@ -38,11 +38,11 @@ def main():
     #animations = []
     
     while not libtcod.console_is_window_closed():
+        game['sdl_renderer'].clear()
         action = {}
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, game['key'], game['mouse'])
         if game['game_state'] == GameStates.CHARACTER_SELECT:
-            char_select_menu(game['con'], game)
-            libtcod.console_flush()
+            char_select_menu(game)
             action = handle_charselect_keys(game['key'])
 
             move = action.get('move')
@@ -66,10 +66,10 @@ def main():
                 if game['cursor_spot'] == 0:
                     game['cursor_spot'] = 1
                 else:
-                    game['message_log'].add_message(Message("You begin your journey as a {} {}".format(
-                        list(game['options'].keys())[game['cursor_0']],
-                        game['options'][list(game['options'].keys())[game['cursor_0']]][game['cursor_1']]
-                    )))
+                    # game['message_log'].add_message(Message("You begin your journey as a {} {}".format(
+                    #     list(game['options'].keys())[game['cursor_0']],
+                    #     game['options'][list(game['options'].keys())[game['cursor_0']]][game['cursor_1']]
+                    # )))
                     load_gamestart(
                         game, 
                         race=list(game['options'].keys())[game['cursor_0']],
@@ -78,10 +78,10 @@ def main():
         
         elif game['game_state'] == GameStates.EQUIPMENT_MENU:
             
-            render_base_screen(game)
-            equipment_menu(game['con'], game)
-            libtcod.console_flush()
-            clear_all(game['con'], game['entities'], game)
+            render_base_screen(game, present = False)
+            equipment_menu(game)
+            #libtcod.console_flush()
+            #clear_all(game['con'], game['entities'], game)
 
             action = handle_equipment_menu_keys(game['key'])
 
@@ -175,10 +175,9 @@ def main():
 
         elif game['game_state'] == GameStates.GROUND_MENU:
             items = get_items_at_loc(game, game['player'].x, game['player'].y)
-            render_base_screen(game)
-            ground_menu(game['con'], game, items)
-            libtcod.console_flush()
-            clear_all(game['con'], game['entities'], game)
+            render_base_screen(game, present=False)
+            ground_menu(game, items)
+            #clear_all(game['con'], game['entities'], game)
 
             action = handle_ground_menu_keys(game['key'])
 
@@ -226,8 +225,8 @@ def main():
 
         elif game['game_state'] == GameStates.MAIN_MENU:
             # RENDER MENU
-            main_menu(game['con'], 'menu_background.png', game)
-            libtcod.console_flush()
+            main_menu(game)
+            #libtcod.console_flush()
             action = handle_mainmenu_keys(game['key'])
 
             move = action.get('move')
@@ -249,11 +248,9 @@ def main():
 
         elif game['game_state'] == GameStates.PLAYER_TURN:
             render_base_screen(game)
-            libtcod.console_flush()
-            clear_all(game['con'], game['entities'], game)
+            #clear_all(game['con'], game['entities'], game)
 
-            if game['game_state'] == GameStates.PLAYER_TURN:
-                action = handle_playerturn_keys(game['key'])
+            action = handle_playerturn_keys(game['key'])
 
             move = action.get('move')
             exit = action.get('exit')

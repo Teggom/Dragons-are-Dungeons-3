@@ -4,12 +4,13 @@ class Tile:
     """
     A tile on a map. It may or may not be blocked, and may or may not block sight.
     """
-    def __init__(self, blocked, palette_type, x, y, state = 0, block_sight=None, palette_seed = None):
+    def __init__(self, blocked, palette_type, x, y, state = 0, block_sight=None, palette_seed = None, char = ' '):
         self.x = x
         self.y = y
         self.state = state
         self.blocked = blocked
         self.set_palette(palette_type, palette_seed)
+        self.char = char
         # By default, if a tile is blocked, it also blocks sight
         if block_sight is None:
             block_sight = blocked
@@ -40,11 +41,20 @@ class Tile:
         self.explored = self.explored
         self.last_seen = self.last_seen
 
-    def get_color(self, state):
+    def get_fg_color(self, state):
+        if not state in self.palette.keys():
+            return(libtcod.Color(255, 255, 255))
+        else:
+            return(self.palette[state]) #TODO update this to get an actual color
+
+    def get_bg_color(self, state):
         if not state in self.palette.keys():
             return(libtcod.Color(255, 255, 255))
         else:
             return(self.palette[state])
+
+    def char(self):
+        return(self.char)
 
     def set_palette(self, palette_type, palette_seed):
         if self.blocked:
