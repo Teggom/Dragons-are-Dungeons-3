@@ -8,7 +8,7 @@ class Inventory:
         self.wearing = {
             "Head" : None,
             "Neck" : None,
-            "Chest" : None,
+            "Chest" : None, 
             "Back" : None,
             "Left Arm" : None,
             "Right Arm" : None,
@@ -41,7 +41,7 @@ class Inventory:
         # Check bag for any pre-existing of this item
         # if already had, add duplicate
         for item in self.bag[got_item.type]:
-            if item.name == got_item.name:
+            if item.t_name == got_item.t_name:
                 item.quantity += got_item.quantity
                 return None
         self.bag[got_item.type].append(got_item)
@@ -93,38 +93,3 @@ class Inventory:
             if e_item.quantity <= 0:
                 self.bag[e_item.type].remove(e_item)
         
-
-        # if e_item.type == 'Weapon':
-        #     # Block for weapons
-        #     pass
-        # elif e_item.type == 'Feet':
-        #     # Block for feet
-        #     pass
-        # elif e_item.type == 'Arm':
-        #     # Block for arms
-        #     if self.wearing[position] == None:
-        #         # not wearing something
-        #         self.wearing[position] = e_item.copy_self(1)
-        #         e_item.quantity -= 1
-        #         self.check_zeros(e_item)
-                
-        #     else: 
-        #         # Swap
-        #         self.get_item(self.wearing[e_item.type])
-        #         self.wearing[e_item.type] = e_item.copy_self(1)
-        #         e_item.quantity -= 1
-        #         self.check_zeros(e_item)
-        # else:
-        #     # Block for everything else
-        #     if self.wearing[e_item.type] == None:
-        #         # not wearing something
-        #         self.wearing[e_item.type] = e_item.copy_self(1)
-        #         e_item.quantity -= 1
-        #         self.check_zeros(e_item)
-                
-        #     else: 
-        #         # Swap
-        #         self.get_item(self.wearing[e_item.type])
-        #         self.wearing[e_item.type] = e_item.copy_self(1)
-        #         e_item.quantity -= 1
-        #         self.check_zeros(e_item)

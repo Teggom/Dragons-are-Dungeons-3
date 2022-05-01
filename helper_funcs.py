@@ -17,5 +17,8 @@ def gear_lookup(slot_name):
         return "Feet"
     if slot_name == 'Left Ring' or slot_name == "Right Ring":
         return 'Rings'
+    else:
+        print('HORRIBLE ERROR {} not found @ helper_funcs:gear_lookup'.format(slot_name))
+        exit()
     
 

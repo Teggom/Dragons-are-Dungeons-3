@@ -5,7 +5,7 @@ class resistance_comp():
             'fire_resistance',
             'frost_resistance',
             'shock_resistance',
-            'arcane_resistance',
+            'arcane_resistance', 
             'poison_resistance',
             'holy_resistance',
             'unholy_resistance',
@@ -24,8 +24,8 @@ class resistance_comp():
 
     def get_this_item_resistance(self, res):
         total = self.resistances["base_" + res + "_resistance"]
-        if self.owner.traits.modifiers.get(res):
-                total += self.owner.traits.modifiers.get(res)
+        if self.owner.traits.on_item['resistances'].get(res):
+                total += self.owner.traits.on_item['resistances'].get(res)
         return(total)
 
 
@@ -60,20 +60,27 @@ class resistance_comp():
                 if self.owner.inventory.wearing[gear_slot]:
                     if self.owner.inventory.wearing[gear_slot].resistances.get(resistance):
                         total += self.owner.inventory.wearing[gear_slot].resistances.get(resistance)
+                    if self.owner.inventory.wearing[gear_slot].trait:
+                        if self.owner.inventory.wearing[gear_slot].trait.on_item['resistances'].get(resistance):
+                            total += self.owner.inventory.wearing[gear_slot].trait.on_item['resistances'].get(resistance)
+                    if len(self.owner.inventory.wearing[gear_slot].conditions) > 0:
+                        for cond in self.owner.inventory.wearing[gear_slot].conditions:
+                            if cond.on_item['resistances'].get(resistance):
+                                total += cond.on_item['resistances'].get(resistance)
         return(total)
     
     def res_check_condition(self, resistance):
         total = 0
         if self.owner.conditions:
             for condition in self.owner.conditions:
-                if condition.modifiers.get(resistance):
-                    total += condition.modifiers.get(resistance)
+                if condition.on_char['resistances'].get(resistance):
+                    total += condition.on_char['resistances'].get(resistance)
         return(total)
 
     def res_check_trait(self, resistance):
         total = 0
         if self.owner.traits:
             for trait in self.owner.traits:
-                if trait.modifiers.get(resistance):
-                    total += trait.modifiers.get(resistance)
+                if trait.on_char['resistances'].get(resistance):
+                    total += trait.on_char['resistances'].get(resistance)
         return(total)

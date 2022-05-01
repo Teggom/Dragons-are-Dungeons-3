@@ -15,19 +15,6 @@ class stats():
         stat_package = self.get_stat_package(unit_type)
         self.resistances = resistances
 
-        # self.base_hp = stat_package['base_hp']
-        # self.curr_hp = stat_package['base_hp']
-        # self.base_mp = stat_package['base_mp']
-        # self.curr_mp = stat_package['base_mp']
-        
-        # Core Stats
-        
-        # self.base_strength = stat_package['base_strength']
-        # self.base_dexterity = stat_package['base_dexterity']
-        # self.base_intelligence = stat_package['base_intelligence']
-        # self.base_charisma = stat_package['base_charisma']
-        # self.base_wisdom = stat_package['base_wisdom']
-        
         # Secondary Stats
         self.base_luck = stat_package['base_luck']
         self.base_memory = stat_package['base_memory']
@@ -457,16 +444,16 @@ class stats():
         total = 0
         if self.owner.traits:
             for trait in self.owner.traits:
-                if trait.modifiers.get(stat):
-                    total += trait.modifiers.get(stat)
+                if trait.on_char['stats'].get(stat):
+                    total += trait.on_char['stats'].get(stat)
         return(total)
 
     def check_condition(self, stat):
         total = 0
         if self.owner.conditions:
             for condition in self.owner.conditions:
-                if condition.modifiers.get(stat):
-                    total += condition.modifiers.get(stat)
+                if condition.on_char['stats'].get(stat):
+                    total += condition.on_char['stats'].get(stat)
         return(total)
 
     def check_equipment(self, stat):
@@ -476,6 +463,14 @@ class stats():
                 if self.owner.inventory.wearing[gear_slot]:
                     if self.owner.inventory.wearing[gear_slot].stats.get(stat):
                         total += self.owner.inventory.wearing[gear_slot].stats.get(stat)
+                    if self.owner.inventory.wearing[gear_slot].trait:
+                        if self.owner.inventory.wearing[gear_slot].trait.on_item['stats'].get(stat):
+                            total += self.owner.inventory.wearing[gear_slot].trait.on_item['stats'].get(stat)                        
+                    if len(self.owner.inventory.wearing[gear_slot].conditions) > 0:
+                        for cond in self.owner.inventory.wearing[gear_slot].conditions:
+                            if cond.on_item['stats'].get(stat):
+                                total += cond.on_item['stats'].get(stat)
+
         return(total)
 
 
@@ -487,16 +482,16 @@ class stats():
         total = 0
         if self.owner.traits:
             for trait in self.owner.traits:
-                if trait.modifiers.get(skill):
-                    total += self.skill_level_to_bonus(trait.modifiers.get(skill))
+                if trait.on_char['skills'].get(skill):
+                    total += self.skill_level_to_bonus(trait.on_char['skills'].get(skill))
         return(total)
 
     def skill_check_condition(self, skill):
         total = 0
         if self.owner.conditions:
             for condition in self.owner.conditions:
-                if condition.modifiers.get(skill):
-                    total += self.skill_level_to_bonus(condition.modifiers.get(skill))
+                if condition.on_char['skills'].get(skill):
+                    total += self.skill_level_to_bonus(condition.on_char['skills'].get(skill))
         return(total)
 
     def skill_check_equipment(self, skill):
@@ -504,8 +499,15 @@ class stats():
         if self.owner.inventory:
             for gear_slot in self.owner.inventory.wearing.keys():
                 if self.owner.inventory.wearing[gear_slot]:
-                    if self.owner.inventory.wearing[gear_slot].stats.get(skill):
-                        total += self.skill_level_to_bonus(self.owner.inventory.wearing[gear_slot].stats.get(skill))
+                    if self.owner.inventory.wearing[gear_slot].skills.get(skill):
+                        total += self.skill_level_to_bonus(self.owner.inventory.wearing[gear_slot].skills.get(skill))
+                    if self.owner.inventory.wearing[gear_slot].trait:
+                        if self.owner.inventory.wearing[gear_slot].trait.on_item['skills'].get(skill):
+                            total += self.skill_level_to_bonus(self.owner.inventory.wearing[gear_slot].trait.on_item['skills'].get(skill))
+                    if len(self.owner.inventory.wearing[gear_slot].conditions) > 0:
+                        for cond in self.owner.inventory.wearing[gear_slot].conditions:
+                            if cond.on_item['skills'].get(skill):
+                                total += self.skill_level_to_bonus(cond.on_item['skills'].get(skill))
         return(total)
     
 

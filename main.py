@@ -15,7 +15,7 @@ from unit_components.ai import BasicMerchant, Wander
 from unit_components.damage import Damage
 from unit_components.inventory import Inventory
 from unit_components.item import Item
-from unit_components.stat_mod import trait
+from unit_components.trait import trait
 from pprint import pprint
 from time import sleep
 from bundled.loaders import load_charselect, load_equipment_menu, load_gamestart, load_ground_menu, load_inventory_menu, load_preamble, load_mainmenu

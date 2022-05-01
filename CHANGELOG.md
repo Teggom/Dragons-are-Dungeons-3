@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.15] - 2022-04-28
+
+### Changed
+- Upgraded Traits and Items
+  - Removed old traits and items
+  - Traits are now well defined structures
+    - Items properly reference all new elements of traits
+- Items
+  - Items can have 1 trait max
+    - Changes the item's name
+  - Items can have multiple conditions
+  - Items now have PERTURN, PERUSE, ONHIT functions
+    - Per Turn will activate every turn the item is equipped
+    - Per Use will activate for items when they are used
+    - On hit will activate for items when they hit another entity
+- Traits
+  - Traits behave differently depending on where they are
+    - Traits contain categories for "on_char" and "on_item", both contain skills/stats/resistances
+    - "on_char"
+      - perturn functions
+        - Activate when the trait's attached item is equipped each turn
+      - perturn damage
+        - Activate when the trait's attached item is equipped and deals damage to equipper
+    - "on_item"
+      - perturn functions
+        - Activates when the traits attached item is equipped each turn
+      - onhit damage
+        - Extra damage given to the item if it is on a weapon.
+          - Sword -> Sword of Fire. Sword of Fire shows extra fire damage stat
+      - onhit enemy func
+        - Activates when the equipped item attacks an enemy successfully
+          - Sword of flaming has a chance to light enemies on fire. 
+
 ## [0.0.14] - 2022-04-28
 
 ### Changed

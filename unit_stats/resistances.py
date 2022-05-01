@@ -1,3 +1,0 @@
-class resistances():
-    pass
-    # TODO
