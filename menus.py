@@ -208,6 +208,12 @@ def draw_item_stat_menu(item_height, item_width, x_pos, y_pos, game, draw = True
         fg = libtcod.lighter_yellow
 
         if item.type == 'Weapon':
+            fg = libtcod.lighter_gray
+            item_console.print(text_indent, draw_line_drop, "Weapon Type:", fg, bg, libtcod.BKGND_NONE, libtcod.RIGHT)
+            item_console.print(old_value_indent, draw_line_drop, item.subtype.capitalize(), fg, bg, libtcod.BKGND_NONE, libtcod.LEFT)
+            draw_line_drop += 1
+
+
             (fg, bg) = (header_fore, header_back)
             item_console.print(old_value_indent, draw_line_drop, "DAMAGE", fg, bg, libtcod.BKGND_SET, libtcod.CENTER)
             draw_line_drop += 1

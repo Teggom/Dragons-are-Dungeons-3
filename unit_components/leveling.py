@@ -1,10 +1,12 @@
 class level_tracker():
-    def __init__(self, exp_mod_stat = 1.5, exp_base_stat = 10, exp_mod_skill = 4, exp_base_skill = 80, *args, **kwargs):
+    def __init__(self, exp_mod_stat = 1.5, exp_base_stat = 10, exp_mod_skill = 4, exp_base_skill = 80, exp_mod_weapon = 3, exp_base_weapon = 150, *args, **kwargs):
 
         self.exp_mod_stat = exp_mod_stat
         self.exp_base_stat = exp_base_stat
         self.exp_mod_skill = exp_mod_skill
         self.exp_base_skill = exp_base_skill
+        self.exp_mod_weapon = exp_mod_weapon
+        self.exp_base_weapon = exp_base_weapon
 
         self.hp_exp = 30
         self.hp_base = 1.4
@@ -19,6 +21,12 @@ class level_tracker():
         to_create_skill = ['athletics', 'acrobatics', 'slight_of_hand', 'stealth', 
             'arcana', 'alchemy', 'crafting', 'bartering', 'persuasion', 
             'intimidation', 'deception']
+
+        to_create_weapon = [
+            'sword', 'dagger', 'greatsword', 'axe', 'hammer', 'whip',
+            'greatshield', 'flail', 'spear', 'halberd', 'scythe',
+            'fist', 'bow', 'crossbow', 'staff', 'wand'
+        ]
         
         for stat in to_create_stat:
             if stat in kwargs:
@@ -49,6 +57,22 @@ class level_tracker():
                 self.levels[skill] = {
                     "level" : 0,
                     "type" : "skill",
+                    "exp" : 0,
+                    "exp_cap" : self.exp_base_skill 
+                }
+        
+        for weapon_level in to_create_weapon:
+            if weapon_level in kwargs:
+                self.levels[weapon_level] = {
+                    "level" : kwargs[weapon_level],
+                    "type" : "weapon",
+                    "exp" : 0,
+                    "exp_cap" : self.exp_base_skill + int(kwargs[weapon_level]**self.exp_mod_skill)
+                }
+            else:
+                self.levels[weapon_level] = {
+                    "level" : 0,
+                    "type" : "weapon_",
                     "exp" : 0,
                     "exp_cap" : self.exp_base_skill 
                 }

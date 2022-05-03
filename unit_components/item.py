@@ -22,6 +22,7 @@ class Item:
             perturn_func =      [], # Functions that activate every turn this is worn / on the ground?
             peruse_func  =      [], # Functions that activate when this item is used
             onhit_enemy_func =  [], # Functions that activate when this item is used on a character or thing
+            subtype =           None,
             quantity =          1   # quantity of this item
             ):
         self.name = name
@@ -43,6 +44,11 @@ class Item:
         self.peruse_func = peruse_func,
         self.onhit_enemy_func = onhit_enemy_func,
         self.quantity = quantity
+
+        if not subtype:
+            self.subtype = self.type
+        else:
+            self.subtype = subtype
         
     @property
     def q_name(self):
@@ -85,7 +91,8 @@ class Item:
             twohand = self.twohand, 
             perturn_func = self.perturn_func,
             peruse_func= self.peruse_func,
-            onhit_enemy_func=self.onhit_enemy_func,            
+            onhit_enemy_func=self.onhit_enemy_func,    
+            subtype=self.subtype,        
             quantity=quantity)
         n_item.owner = self.owner
         return(n_item)

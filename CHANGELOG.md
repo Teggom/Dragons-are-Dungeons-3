@@ -4,7 +4,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.0.15] - 2022-04-28
+## [0.0.16] - 2022-05-02
+
+### Added
+- Noise stat (Below is stuff it will be used for)
+  - Will be used for enemy states
+  - Items carry noise
+  - Traits and Conditions can lower noise
+  - Noise can alert enemies
+    - Enemies will enter a searching state rather than an idle state and will perform perception checks each turn as they move towards the source
+  - Some spells or use items can create noise
+  - No formula for noise yet
+- Weapon types
+  - Weapon types that can level are as follows
+    - sword, dagger, greatsword, axe, hammer, whip, flail, spear, halberd, scythe, fist, bow, crossbow, staff, wand
+  - Weapon types that cannot level are as follows
+    - shield, greatshield, non-weapon
+      - non-weapon fills category such as charm/torch/bell
+      - shields provide no damage (usually?)
+- Four new skills in the works
+  - Mining, Harvesting, Enchanting, Summoning
+
+### Changed
+- Weapon type is now displayed on the item card menu
+
+### Fixed
+- Removed already-moved files from git
+
+## [0.0.15] - 2022-05-01
 
 ### Changed
 - Upgraded Traits and Items

@@ -120,6 +120,7 @@ class item_generator():
                 perturn_func =      [],
                 peruse_func =       [],
                 onhit_enemy_func =  [],
+                subtype=            "sword",
                 quantity =          1
             )
         if name == "iron_dagger":
@@ -138,6 +139,7 @@ class item_generator():
                 perturn_func =      [],
                 peruse_func =       [],
                 onhit_enemy_func =  [],
+                subtype=            "dagger",
                 quantity =          1
             )
         if name == "iron_hammer":
@@ -156,6 +158,7 @@ class item_generator():
                 perturn_func =      [],
                 peruse_func =       [],
                 onhit_enemy_func =  [],
+                subtype=            "hammer",
                 quantity =          1
             )
         if name == "iron_axe":
@@ -174,6 +177,7 @@ class item_generator():
                 perturn_func =      [],
                 peruse_func =       [],
                 onhit_enemy_func =  [],
+                subtype=            "axe",
                 quantity =          1
             )
         if name == "iron_ring":
