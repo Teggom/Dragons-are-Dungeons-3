@@ -6,8 +6,6 @@ class stats():
     def __init__(self, unit_type="Human", level_comp = None, resistances = None):
         # Rather than set these below, set them here.
         #  helps keep track of what I have and have not defined
-
-        
         if resistances == None:
             resistances = resistance_comp()
         if level_comp == None:
@@ -20,6 +18,7 @@ class stats():
         self.base_memory = stat_package['base_memory']
         self.base_sight = stat_package['base_sight']
         self.base_perception = stat_package['base_perception']
+        self.base_noise = 0 #TODO FIX
 
         # TODO CHANGE THIS, it's overriding the parameters passed in
         self.level_tracker = level_tracker(
@@ -166,6 +165,41 @@ class stats():
         return(Bonus)
         #return(max(0, Bonus))
 
+    @property
+    def mining(self):
+        Bonus = self.get_skill_mod(int(self.strength*.75) + int(self.wisdom*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['mining']['level'])
+        Bonus += self.skill_check_condition("mining")
+        Bonus += self.skill_check_traits("mining")
+        Bonus += self.skill_check_equipment("mining")
+        return(Bonus)
+
+    @property
+    def enchanting(self):
+        Bonus = self.get_skill_mod(int(self.wisdom*.75) + int(self.intelligence*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['enchanting']['level'])
+        Bonus += self.skill_check_condition("enchanting")
+        Bonus += self.skill_check_traits("enchanting")
+        Bonus += self.skill_check_equipment("enchanting")
+        return(Bonus)
+    
+    @property
+    def harvesting(self):
+        Bonus = self.get_skill_mod(int(self.dexterity*.75) + int(self.wisdom*.25))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['harvesting']['level'])
+        Bonus += self.skill_check_condition("harvesting")
+        Bonus += self.skill_check_traits("harvesting")
+        Bonus += self.skill_check_equipment("harvesting")
+        return(Bonus)
+    
+    @property
+    def summoning(self):
+        Bonus = self.get_skill_mod(int(self.charisma*.5) + int(self.wisdom*.5))
+        Bonus += self.skill_level_to_bonus(self.level_tracker.levels['summoning']['level'])
+        Bonus += self.skill_check_condition("summoning")
+        Bonus += self.skill_check_traits("summoning")
+        Bonus += self.skill_check_equipment("summoning")
+        return(Bonus)
 
 
     # # # # # # # # #
@@ -293,6 +327,13 @@ class stats():
         total += self.check_equipment("perception")
         return(max(0, total))
 
+    @property
+    def noise(self):
+        total = self.base_noise
+        total += self.check_condition("noise")
+        total += self.check_traits("noise")
+        total += self.check_equipment("noise")
+        return(max(0, total))
 
 
 

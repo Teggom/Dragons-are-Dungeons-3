@@ -35,6 +35,7 @@ class Damage:
             damage += sum(sample(range(self.upper), self.dice_rolls)) + self.dice_rolls
         return((damage, self.type))
     
+    
     @property
     def avg(self):
         total = 0

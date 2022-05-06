@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.17] - 2022-05-04
+
+### Added 
+- New Skills and Stats...
+  - Added to Equipment menu windows
+  - Have leveling set up
+  - Have proper references set up
+- "What you know" Menu
+  - Shows things that your perception stat is high enough to see
+
+### Changed
+- Re-enabled message feed
+
+## [0.0.17] - 2022-05-06
+
+### Added
+- Message feed is back along the bottom of the main map
+- Map Info Panel on the right side of the screen
+  - Top part displays player meta information
+    - Name/Race/Class/Weapons/Gear Score/"Score"/HP/MP
+  - Middle part displays item meta information
+    - Shows item/entity sprites that are in the FOV
+    - , or . to cycle pages 
+    - Sorted by Rarity
+      - / to toggle sort mode (A-Z, Distance)
+  - Bottom part displays character meta information
+    - Shows enemies/NPC/affiliation and such
+    - < or > to cycle pages
+    - Sorted by Est. Difficulty
+      - ? to toggle sort mode (A-Z, Distance)
+- Items have value now
+  - Value is dynamic, just judges how much that item is worth.
+
+
 ## [0.0.16] - 2022-05-02
 
 ### Added

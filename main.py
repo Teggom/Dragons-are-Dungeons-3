@@ -1,3 +1,4 @@
+from random import sample
 import libtcodpy as libtcod
 from time import sleep
 from bundled.game_messages import Message
@@ -255,6 +256,10 @@ def main():
             move = action.get('move')
             exit = action.get('exit')
             fullscreen = action.get('fullscreen')
+            item_display_change = action.get('item_display')
+            item_display_sort = action.get('item_display_sort')
+            entity_display_change = action.get('entity_display')
+            entity_display_sort = action.get('entity_display_sort')
             ground_menu_opened = action.get('ground_menu_opened')
             equipment_menu_opened = action.get('equipment_menu_opened')
             inventory_menu_opened = action.get('inventory_menu_opened')
@@ -265,7 +270,26 @@ def main():
                 load_equipment_menu(game)
             if inventory_menu_opened:
                 load_inventory_menu(game)
+            if item_display_sort:
+                game['item_display_sort'] = (game['item_display_sort'] + item_display_sort) % 3
+            if item_display_change:
+                game['item_display_page'] += item_display_change
+            if entity_display_sort:
+                game['entity_display_sort'] = (game['entity_display_sort'] + entity_display_sort) % 3
+            if entity_display_change:
+                game['entity_display_page'] += entity_display_change
             if move and game['game_state'] == GameStates.PLAYER_TURN:
+                ## TODO REMOVE
+                tx = sample([1, 2, 3, 4, 5, 6, 7, 8, 9], 1)[0]
+                rx = sample([100, 200, 300], 1)[0]
+                vx = sample([1, 2, 3, 4], 1)[0]
+                game['message_log'].add_message(Message(str(tx)*rx), verbosity=vx)
+                ## TODO REMOVE
+                game['message_log'].add_message(
+                    game['player'].take_damage([Damage("1d2", "pure")])
+                )
+                game['player'].stats.curr_mp -= 1
+                ## TODO REMOVE
                 dx, dy = move
                 destination_x = game['player'].x + dx
                 destination_y = game['player'].y + dy

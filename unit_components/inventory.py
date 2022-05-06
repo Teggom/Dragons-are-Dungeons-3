@@ -34,7 +34,24 @@ class Inventory:
             "Feet" : [],
             "Item" : []
         }
-                
+
+
+    @property
+    def gear_worth(self):
+        value = 0    
+        for key in self.wearing.keys():
+            if self.wearing[key] is not None:
+                value += self.wearing[key].value
+        return(value)
+
+    @property
+    def bag_worth(self):
+        value = 0
+        for key in self.bag.keys():
+            for itm in self.bag[key]:
+                value += itm.value * itm.quantity
+        value += self.gear_worth
+        return(value)
 
     def get_item(self, got_item):
         got_item.owner = self.owner

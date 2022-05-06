@@ -21,15 +21,15 @@ def menu_strip(game):
         for elem in v[0]:
             text += elem
         if game['option'] == i:
-            strip_console.print(i*18-5, 0, " "*18, libtcod.white, libtcod.gray, libtcod.BKGND_SET, libtcod.LEFT)
-            strip_console.print(i*18, 0, text, libtcod.black, libtcod.gray, libtcod.BKGND_NONE, libtcod.LEFT)
+            strip_console.print(1+i*18-5, 0, " "*18, libtcod.white, libtcod.gray, libtcod.BKGND_SET, libtcod.LEFT)
+            strip_console.print(1+i*18, 0, text, libtcod.black, libtcod.gray, libtcod.BKGND_NONE, libtcod.LEFT)
         else:
             dist = 0
             for j, k in enumerate(v[0]):
                 if j == v[1]:
-                    strip_console.print(i*18+dist, 0, k, libtcod.darker_yellow, libtcod.black, libtcod.BKGND_SET, libtcod.LEFT)
+                    strip_console.print(1+i*18+dist, 0, k, libtcod.darker_yellow, libtcod.black, libtcod.BKGND_SET, libtcod.LEFT)
                 else:
-                    strip_console.print(i*18+dist, 0, k, libtcod.gray, libtcod.black, libtcod.BKGND_SET, libtcod.LEFT)
+                    strip_console.print(1+i*18+dist, 0, k, libtcod.gray, libtcod.black, libtcod.BKGND_SET, libtcod.LEFT)
                 dist += len(k)
     game['sdl_renderer'].copy(
         game['console_renderer_text'].render(strip_console),
@@ -94,6 +94,7 @@ def equipment_menu(game):
     )
 
     # BAG
+    game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])].sort(key=lambda x: x.s_value, reverse = True)
     using_bag = game['player'].inventory.bag[gear_lookup(game['slot_names'][game['cursor_0']])]
     bag_height = len(game['slot_names'])+2
     bag_width = 34
@@ -198,7 +199,15 @@ def draw_item_stat_menu(item_height, item_width, x_pos, y_pos, game, draw = True
         draw_line_drop += 1
         
         item_console.print(text_indent, draw_line_drop, "Value:", fg, bg, libtcod.BKGND_NONE, libtcod.RIGHT)
-        item_console.print(old_value_indent, draw_line_drop, "TODO", fg, bg, libtcod.BKGND_NONE, libtcod.LEFT)
+        item_console.print(old_value_indent, draw_line_drop, str(item.value), fg, bg, libtcod.BKGND_NONE, libtcod.LEFT)
+        # item.print_value()
+        draw_line_drop += 1
+
+        item_console.print(text_indent, draw_line_drop, "Trait:", fg, bg, libtcod.BKGND_NONE, libtcod.RIGHT)
+        if item.trait:
+            item_console.print(old_value_indent, draw_line_drop, item.trait.shown_name, fg, bg, libtcod.BKGND_NONE, libtcod.LEFT)
+        else:
+            item_console.print(old_value_indent, draw_line_drop, "None", fg, bg, libtcod.BKGND_NONE, libtcod.LEFT)
         draw_line_drop += 1
 
         item_console.print(text_indent, draw_line_drop, "Type:", fg, bg, libtcod.BKGND_NONE, libtcod.RIGHT)
@@ -253,8 +262,8 @@ def draw_item_stat_menu(item_height, item_width, x_pos, y_pos, game, draw = True
             (fg, bg) = (header_fore, header_back)
             item_console.print(old_value_indent, draw_line_drop, "STATS", fg, bg, libtcod.BKGND_SET, libtcod.CENTER)
             draw_line_drop += 1
-            stat_raw_names = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'luck', 'memory', 'sight', 'perception']
-            stat_pt_names = ["Strength", "Dexterity", "Intelligence", "Wisdom", "Charisma", "Luck", "Memory", "Sight", "Perception"]
+            stat_raw_names = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'luck', 'memory', 'sight', 'perception', 'noise']
+            stat_pt_names = ["Strength", "Dexterity", "Intelligence", "Wisdom", "Charisma", "Luck", "Memory", "Sight", "Perception", "Noise"]
             for i in range(len(stat_raw_names)):
                 cur_stat = stat_raw_names[i]
                 new_stat = 0
@@ -407,8 +416,8 @@ def draw_item_stat_menu(item_height, item_width, x_pos, y_pos, game, draw = True
             item_console.print(old_value_indent, draw_line_drop, "SKILLS", fg, bg, libtcod.BKGND_SET, libtcod.CENTER)
             
             draw_line_drop += 1
-            skill_raw_names = ['athletics', 'acrobatics', 'slight_of_hand', 'stealth', 'arcana', 'alchemy', 'crafting', 'bartering', 'persuasion', 'intimidation', 'deception']
-            skill_pt_names = ["Athletics", 'Acrobatics', 'Slight of Hand', 'Stealth', 'Arcana', 'Alchemy', 'Crafting', 'Bartering', "Persuasion", 'Intimidation', "Deception"]
+            skill_raw_names = ['athletics', 'acrobatics', 'slight_of_hand', 'stealth', 'arcana', 'alchemy', 'crafting', 'bartering', 'persuasion', 'intimidation', 'deception', 'mining', 'enchanting', 'harvesting', 'summoning']
+            skill_pt_names = ["Athletics", 'Acrobatics', 'Slight of Hand', 'Stealth', 'Arcana', 'Alchemy', 'Crafting', 'Bartering', "Persuasion", 'Intimidation', "Deception", 'Mining', 'Enchanting', 'Harvesting', "Summoning"]
             for i in range(len(skill_raw_names)):
                 cur_stat = skill_raw_names[i]
                 #print(cur_stat, stat_drop)
@@ -745,10 +754,8 @@ def ground_menu(game, items):
             if i >= page*(height-2) and i < (page+1)*(height-2):
                 text = ""
                 if game['cursor'] == i:
-
                     ground_console.print(1, i+1-page*(height-2), v.q_name, libtcod.black, libtcod.lighter_yellow)
                 else:
-
                     ground_console.print(1, i+1-page*(height-2), v.q_name, libtcod.gray, libtcod.black)
                 text += v.name
 
@@ -858,9 +865,9 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
 
 
     if game['cursor_tab'] == 0:
-        chara_height = 15
+        chara_height = 16
     elif game['cursor_tab'] == 1:
-        chara_height = 15
+        chara_height = 19
     elif game['cursor_tab'] == 2:
         chara_height = 14
     chara_console= libtcod.Console(chara_width, chara_height)
@@ -898,7 +905,7 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
         chara_console.print(fourth_indent, health_drop-1, "Buffs", fg, bg, alignment=libtcod.LEFT)
         chara_console.print(fifth_indent, health_drop-1, "Total", fg, bg, alignment=libtcod.RIGHT)
 
-        for i in range(11):
+        for i in range(chara_height-4):
             if i % 2 == 0:
                 bg = libtcod.black
             else:
@@ -907,14 +914,14 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
 
         (fg, bg) = (libtcod.lighter_gray, libtcod.black)
 
-        indent_1_ops = ['Max Health', 'Max Mana', 'Strength', 'Dexterity', 'Intelligence', "Wisdom", 'Charisma', 'Luck', 'Memory', "Sight", 'Perception']
+        indent_1_ops = ['Max Health', 'Max Mana', 'Strength', 'Dexterity', 'Intelligence', "Wisdom", 'Charisma', 'Luck', 'Memory', "Sight", 'Perception', "Noise"]
         for i, v in enumerate(indent_1_ops):
             chara_console.print(first_indent, health_drop + i, v, fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
         
         indent_2_ops = [str(game['player'].stats.base_hp), str(game['player'].stats.base_mp), str(game['player'].stats.base_strength),
                         str(game['player'].stats.base_dexterity), str(game['player'].stats.base_intelligence), str(game['player'].stats.base_wisdom),
                         str(game['player'].stats.base_charisma), str(game['player'].stats.base_luck), str(game['player'].stats.base_memory), 
-                        str(game['player'].stats.base_sight), str(game['player'].stats.base_perception)]
+                        str(game['player'].stats.base_sight), str(game['player'].stats.base_perception), str(game['player'].stats.base_noise)]
         for i, v in enumerate(indent_2_ops):
             chara_console.print(second_indent, health_drop + i, v, fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
         
@@ -928,7 +935,8 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
                         str(game['player'].stats.check_equipment("luck")),
                         str(game['player'].stats.check_equipment("memory")),
                         str(game['player'].stats.check_equipment("sight")),
-                        str(game['player'].stats.check_equipment("perception"))]
+                        str(game['player'].stats.check_equipment("perception")),
+                        str(game['player'].stats.check_equipment("noise"))]
         for i, v in enumerate(indent_3_ops):
             chara_console.print(third_indent, health_drop + i, v, fg, bg, libtcod.BKGND_ADD, libtcod.LEFT)
 
@@ -943,7 +951,8 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
             str(game['player'].stats.check_condition("luck")+game['player'].stats.check_traits("luck")),
             str(game['player'].stats.check_condition("memory")+game['player'].stats.check_traits("memory")),
             str(game['player'].stats.check_condition("sight")+game['player'].stats.check_traits("sight")),
-            str(game['player'].stats.check_condition("perception")+game['player'].stats.check_traits("perception"))
+            str(game['player'].stats.check_condition("perception")+game['player'].stats.check_traits("perception")),
+            str(game['player'].stats.check_condition("noise")+game['player'].stats.check_traits("noise"))
         ]
         for i, v in enumerate(indent_4_ops):
             chara_console.print(fourth_indent, health_drop + i, v, fg, bg, libtcod.BKGND_ADD, libtcod.LEFT)
@@ -954,7 +963,7 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
             str(game['player'].stats.hp), str(game['player'].stats.mp), str(game['player'].stats.strength),
             str(game['player'].stats.dexterity), str(game['player'].stats.intelligence), str(game['player'].stats.wisdom),
             str(game['player'].stats.charisma), str(game['player'].stats.luck), str(game['player'].stats.memory),
-            str(game['player'].stats.sight), str(game['player'].stats.perception)
+            str(game['player'].stats.sight), str(game['player'].stats.perception), str(game['player'].stats.noise)
         ]
         for i, v in enumerate(indent_5_ops):
             chara_console.print(fifth_indent, health_drop + i, v, fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
@@ -981,7 +990,7 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
         chara_console.print(skill_sixth_indent, skill_start_drop-1, "Stat Bonus", fg, bg, alignment=libtcod.LEFT)
         chara_console.print(skill_seventh_indent, skill_start_drop-1, "Total Bonus", fg, bg, alignment=libtcod.RIGHT)
 
-        for i in range(11):
+        for i in range(chara_height-4):
             if i % 2 == 0:
                 bg = libtcod.black
             else:
@@ -1000,7 +1009,11 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
             'bartering',
             'persuasion',
             'intimidation',
-            'deception'
+            'deception',
+            'mining',
+            'enchanting',
+            'harvesting',
+            'summoning'
         ]
         ops = [
             'Athletics',
@@ -1013,7 +1026,11 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
             'Bartering',
             "Persuasion",
             'Intimidation',
-            "Deception"
+            "Deception",
+            'Mining',
+            'Enchanting',
+            "Harvesting",
+            "Summoning"
         ]
         for i, v in enumerate(ops):
             chara_console.print(skill_first_indent, skill_start_drop+i, v, fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
@@ -1033,6 +1050,10 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
         chara_console.print(skill_sixth_indent, skill_start_drop+8, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.75) + int(game['player'].stats.wisdom*.25))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # persuasion 
         chara_console.print(skill_sixth_indent, skill_start_drop+9, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.75) + int(game['player'].stats.strength*.25))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # intimidation 
         chara_console.print(skill_sixth_indent, skill_start_drop+10, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.75) + int(game['player'].stats.intelligence*.25))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # deception
+        chara_console.print(skill_sixth_indent, skill_start_drop+11, str(game['player'].stats.get_skill_mod(int(game['player'].stats.strength*.75) + int(game['player'].stats.wisdom*.25))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # mining
+        chara_console.print(skill_sixth_indent, skill_start_drop+12, str(game['player'].stats.get_skill_mod(int(game['player'].stats.wisdom*.75) + int(game['player'].stats.intelligence*.25))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # enchanting
+        chara_console.print(skill_sixth_indent, skill_start_drop+13, str(game['player'].stats.get_skill_mod(int(game['player'].stats.dexterity*.75) + int(game['player'].stats.wisdom*.25))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # harvesting
+        chara_console.print(skill_sixth_indent, skill_start_drop+14, str(game['player'].stats.get_skill_mod(int(game['player'].stats.charisma*.5) + int(game['player'].stats.wisdom*.5))), fg, bg, libtcod.BKGND_ADD, libtcod.LEFT) # summoning
 
         chara_console.print(skill_seventh_indent, skill_start_drop+0, str(game['player'].stats.athletics), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
         chara_console.print(skill_seventh_indent, skill_start_drop+1, str(game['player'].stats.acrobatics), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
@@ -1045,7 +1066,10 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
         chara_console.print(skill_seventh_indent, skill_start_drop+8, str(game['player'].stats.persuasion), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
         chara_console.print(skill_seventh_indent, skill_start_drop+9, str(game['player'].stats.intimidation), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
         chara_console.print(skill_seventh_indent, skill_start_drop+10, str(game['player'].stats.deception), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
-        
+        chara_console.print(skill_seventh_indent, skill_start_drop+11, str(game['player'].stats.mining), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
+        chara_console.print(skill_seventh_indent, skill_start_drop+12, str(game['player'].stats.enchanting), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
+        chara_console.print(skill_seventh_indent, skill_start_drop+13, str(game['player'].stats.harvesting), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
+        chara_console.print(skill_seventh_indent, skill_start_drop+14, str(game['player'].stats.summoning), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
     elif game['cursor_tab'] == 2:
         res_drop = res_box_drop + 3
         for i in range(10):
@@ -1110,7 +1134,6 @@ def draw_character_stat_menu(chara_height, chara_width, pos_x, pos_y, game):
             chara_console.print(res_fifth_indent, res_drop+i, str(game['player'].stats.resistances.get_resistance(v, False)), fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
             chara_console.print(res_sixth_indent, res_drop+i, str(int(100*round(game['player'].stats.resistances.get_resistance(v), 2)))+" %", fg, bg, libtcod.BKGND_ADD, libtcod.RIGHT)
 
-        
     game['sdl_renderer'].copy(
         game['console_renderer_text'].render(chara_console),
         dest = (

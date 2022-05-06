@@ -1,5 +1,7 @@
+from bundled.game_messages import Message
 from unit_components.fighting_comp import stats
 from unit_components.ai import Wander, BasicMerchant, BasicMonster
+from unit_components.inventory import Inventory
 import math
 import tcod as libtcod
 
@@ -10,7 +12,7 @@ class Entity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-    def __init__(self, x, y, char, color, name, race=None, blocks=False, ai=None, traits=[],
+    def __init__(self, x, y, char, color, name, race=None, clss = None, blocks=False, ai=None, traits=[],
                     item=None, inventory=None):
         self.x = x
         self.y = y
@@ -18,6 +20,7 @@ class Entity:
         self.color = color
         self.name = name
         self.race = race
+        self.clss = clss
         self.blocks = blocks
         self.stats = stats(race)
         self.stats.owner = self 
@@ -28,6 +31,9 @@ class Entity:
         self.conditions = []
         self.item = item
         self.inventory = inventory
+
+        if not self.inventory:
+            self.inventory = Inventory()
 
         if self.ai:
             self.ai.owner = self
@@ -41,6 +47,48 @@ class Entity:
         
         self.stats.curr_hp = self.stats.max_hp
         self.stats.curr_mp = self.stats.max_mp
+
+
+    @property
+    def diff(self):
+        diff = 0
+        for trait in self.traits:
+            for skill in trait.on_char['skills']:
+                diff += trait.on_char['skills'][skill]
+            for stat in trait.on_char['stats']:
+                diff += trait.on_char['stats'][stat]
+            for res in trait.on_char['resistances']:
+                diff += trait.on_char['resistances'][res]
+            diff += len(trait.on_char['perturn_func'])*3
+        
+        for condition in self.conditions:
+            for skill in condition.on_char['skills']:
+                diff += condition.on_char['skills'][skill]
+            for stat in condition.on_char['stats']:
+                diff += condition.on_char['stats'][stat]
+            for res in condition.on_char['resistances']:
+                diff += condition.on_char['resistances'][res]
+            diff += len(condition.on_char['perturn_func'])*3
+        
+        for gear_slot in self.inventory.wearing.keys():
+            if self.inventory.wearing[gear_slot]:
+                diff += int(1 + self.inventory.wearing[gear_slot].value / 20 )
+        # stats
+        diff += self.stats.luck*5
+        diff += self.stats.sight*2
+        diff += self.stats.perception
+        diff += self.stats.max_hp
+        diff += self.stats.max_mp
+        diff += self.stats.strength
+        diff += self.stats.dexterity
+        diff += self.stats.intelligence
+        diff += self.stats.wisdom
+        diff += self.stats.charisma
+
+        return(diff)
+
+        # skills
+        # resistances
 
     def give_condition(self, condition):
         self.conditions.append(condition)
@@ -132,10 +180,11 @@ class Entity:
                 damage_to_take[dmg.type] = dmg.get_damage()[0]
         taking = 0
         for d_type in damage_to_take.keys():
-            taking += math.ceiling(
+            taking += math.ceil(
                 damage_to_take[d_type] * self.stats.resistances.get_resistance(d_type)
             )
         self.stats.curr_hp = max(0, self.stats.curr_hp - taking)
+        return(Message("{} takes {} damage!".format(self.name, taking), color = libtcod.darker_red))
 
         
 def get_blocking_entities_at_location(entities, destination_x, destination_y):

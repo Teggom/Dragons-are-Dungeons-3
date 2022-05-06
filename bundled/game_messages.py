@@ -1,5 +1,5 @@
 import tcod as libtcod
-
+from enum import Enum
 import textwrap
 
 
@@ -12,11 +12,14 @@ class Message:
 class MessageLog:
     def __init__(self, x, width, height):
         self.messages = []
+        self.verbosities = []
         self.x = x
         self.width = width
         self.height = height
 
-    def add_message(self, message):
+    
+
+    def add_message(self, message, verbosity=4):
         # Split the message if necessary, among multiple lines
         new_msg_lines = textwrap.wrap(message.text, self.width)
 
@@ -27,3 +30,10 @@ class MessageLog:
 
             # Add the new line as a Message object, with the text and the color
             self.messages.append(Message(line, message.color))
+
+
+class Verbosity(Enum):
+    MAJOR = 1
+    DIALOGUE = 2
+    GENERAL = 3
+    DEBUG = 4

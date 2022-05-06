@@ -20,7 +20,7 @@ class level_tracker():
 
         to_create_skill = ['athletics', 'acrobatics', 'slight_of_hand', 'stealth', 
             'arcana', 'alchemy', 'crafting', 'bartering', 'persuasion', 
-            'intimidation', 'deception']
+            'intimidation', 'deception', 'mining', 'enchanting', 'harvesting', 'summoning']
 
         to_create_weapon = [
             'sword', 'dagger', 'greatsword', 'axe', 'hammer', 'whip',

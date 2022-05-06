@@ -90,6 +90,18 @@ def handle_playerturn_keys(key):
         return {'move': (1, 1)}
     elif key.text == 's':
         return {'wait': True}
+    elif key.text == ',':
+        return {'item_display' : -1}
+    elif key.text == '.':
+        return {'item_display' : 1}
+    elif key.text == '/':
+        return {'item_display_sort' : 1}
+    elif key.text == '<':
+        return {'entity_display' : -1}
+    elif key.text == '>':
+        return {'entity_display' : 1}
+    elif key.text == '?':
+        return {'entity_display_sort' : 1}
     elif key.text == 'g':
         return {'ground_menu_opened' : True}
     elif key.text == 'u':

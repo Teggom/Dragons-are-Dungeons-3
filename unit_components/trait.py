@@ -36,13 +36,13 @@ class trait():
         self.on_char = on_char
         self.on_item = on_item
 
-class trait2():
-    def __init__(self, trait_name, item_namechange = [0, ""], duration=-1, is_condition=False, *args, **kwargs):
-        self.name = trait_name
-        self.modifiers = {}
-        self.duration = duration
-        self.is_condition = is_condition
-        for key in kwargs:
-            self.modifiers[key] = kwargs[key]
+# class trait2():
+#     def __init__(self, trait_name, item_namechange = [0, ""], duration=-1, is_condition=False, *args, **kwargs):
+#         self.name = trait_name
+#         self.modifiers = {}
+#         self.duration = duration
+#         self.is_condition = is_condition
+#         for key in kwargs:
+#             self.modifiers[key] = kwargs[key]
         
     
